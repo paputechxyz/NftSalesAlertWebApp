@@ -29,9 +29,6 @@ export default function WatchlistPage() {
           slug: item.slug,
           name: item.name,
           image_url: item.image_url,
-          // Note: The get_user_watchlist endpoint in backend returns limited fields
-          // We might need to fetch full collection details if needed, 
-          // but for now we'll use what's available
           volume: item.volume || 0,
           sales: item.sales || 0,
           num_owners: item.num_owners || 0,
