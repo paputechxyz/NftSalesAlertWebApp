@@ -4,11 +4,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useUI } from '@/context/UIContext';
+import { usePathname } from 'next/navigation';
 import { Star, LogOut, User as UserIcon, LayoutGrid, List } from 'lucide-react';
 
 export default function Navbar() {
   const { user, login, logout, tier, watchlistCount } = useAuth();
   const { viewMode, setViewMode } = useUI();
+  const pathname = usePathname();
+  const isWatchlistPage = pathname === '/watchlist';
 
   return (
     <nav className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-50">
@@ -28,35 +31,37 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6">
+          {!isWatchlistPage && (
+            <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-all ${
+                  viewMode === 'grid' 
+                    ? 'bg-blue-500 text-white shadow-lg' 
+                    : 'text-slate-500 hover:text-white'
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid size={16} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition-all ${
+                  viewMode === 'list' 
+                    ? 'bg-blue-500 text-white shadow-lg' 
+                    : 'text-slate-500 hover:text-white'
+                }`}
+                title="List View"
+              >
+                <List size={16} />
+              </button>
+            </div>
+          )}
+
           <Link href="/watchlist" className="text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-2">
             <Star size={16} className={watchlistCount > 0 ? "text-yellow-500" : ""} fill={watchlistCount > 0 ? "currentColor" : "none"} />
             Watchlist
           </Link>
-
-          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 ml-2">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-all ${
-                viewMode === 'grid' 
-                  ? 'bg-blue-500 text-white shadow-lg' 
-                  : 'text-slate-500 hover:text-white'
-              }`}
-              title="Grid View"
-            >
-              <LayoutGrid size={16} />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-all ${
-                viewMode === 'list' 
-                  ? 'bg-blue-500 text-white shadow-lg' 
-                  : 'text-slate-500 hover:text-white'
-              }`}
-              title="List View"
-            >
-              <List size={16} />
-            </button>
-          </div>
 
           {user ? (
             <div className="flex items-center gap-4 pl-4 border-l border-white/10">

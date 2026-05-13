@@ -21,14 +21,22 @@ interface NFTCardProps {
   isWatched: boolean;
   onToggleWatch: (slug: string) => void;
   viewMode?: 'grid' | 'list';
+  onClick?: (collection: NFTCollection) => void;
 }
 
-export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode = 'grid' }: NFTCardProps) {
+export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode = 'grid', onClick }: NFTCardProps) {
   const { user } = useAuth();
+
+  const handleContainerClick = () => {
+    if (onClick) onClick(collection);
+  };
 
   if (viewMode === 'list') {
     return (
-      <div className="glass-card overflow-hidden group flex items-center p-4 gap-6">
+      <div 
+        onClick={handleContainerClick}
+        className={`glass-card overflow-hidden group flex items-center p-4 gap-6 ${onClick ? 'cursor-pointer hover:border-blue-500/50' : ''}`}
+      >
         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl">
           {collection.image_url ? (
             <Image
@@ -78,7 +86,10 @@ export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode
   }
 
   return (
-    <div className="glass-card overflow-hidden group">
+    <div 
+      onClick={handleContainerClick}
+      className={`glass-card overflow-hidden group ${onClick ? 'cursor-pointer hover:border-blue-500/30' : ''}`}
+    >
       <div className="relative h-48 w-full overflow-hidden">
         <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
           {collection.image_url ? (

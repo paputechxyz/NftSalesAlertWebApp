@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 import { useUI } from '@/context/UIContext';
 import SalesFeed from '@/components/SalesFeed';
@@ -15,6 +15,15 @@ export default function WatchlistPage() {
   const [loading, setLoading] = useState(true);
   const { viewMode } = useUI();
   const router = useRouter();
+  const [selectedCollection, setSelectedCollection] = useState<NFTCollection | null>(null);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedCollection(null);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   const limit = tier > 1 ? 20 : 1;
 
@@ -89,8 +98,8 @@ export default function WatchlistPage() {
   }
 
   return (
-    <main className="min-h-screen p-8 md:p-24 bg-transparent">
-      <div className="max-w-7xl mx-auto">
+    <main className="min-h-screen p-8 md:p-12 bg-transparent">
+      <div className="max-w-[1600px] mx-auto">
         <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tighter">
@@ -98,12 +107,6 @@ export default function WatchlistPage() {
             </h1>
             <p className="text-slate-400">
               Keep track of your favorite collections and their latest performance.
-            </p>
-          </div>
-          <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-            <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Watchlist Limit</p>
-            <p className="text-2xl font-bold text-white">
-              {watchlist.length} <span className="text-slate-600">/ {limit}</span>
             </p>
           </div>
         </header>
@@ -119,28 +122,71 @@ export default function WatchlistPage() {
             </button>
           </div>
         ) : (
-          <div className="space-y-16">
-            <div className={viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
-              : "flex flex-col gap-4"
-            }>
-              {watchlist.map((collection) => (
-                <NFTCard 
-                  key={collection.slug} 
-                  collection={collection} 
-                  isWatched={true}
-                  onToggleWatch={toggleWatch}
-                  viewMode={viewMode}
-                />
-              ))}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            {/* Left Column: Watchlist (Smaller) */}
+            <div className="lg:col-span-4 xl:col-span-3 space-y-8 sticky top-24">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white tracking-tight">Watchlist</h2>
+                <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-lg">
+                  <p className="text-xs font-medium text-white">
+                    {watchlist.length} <span className="text-slate-500">/ {limit}</span>
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-4">
+                {watchlist.map((collection) => (
+                  <NFTCard 
+                    key={collection.slug} 
+                    collection={collection} 
+                    isWatched={true}
+                    onToggleWatch={toggleWatch}
+                    viewMode="list" // Force list mode for sidebar
+                    onClick={(col) => setSelectedCollection(col)}
+                  />
+                ))}
+              </div>
             </div>
 
-            <div className="border-t border-white/5 pt-16">
+            {/* Right Column: Sales Feed (Larger) */}
+            <div className="lg:col-span-8 xl:col-span-9">
               <SalesFeed />
             </div>
           </div>
         )}
       </div>
+
+      {/* Collection Detail Modal */}
+      {selectedCollection && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setSelectedCollection(null)}
+        >
+          <div 
+            className="w-full max-w-md animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              <button 
+                onClick={() => setSelectedCollection(null)}
+                className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"
+                title="Close"
+              >
+                <X size={20} />
+              </button>
+              <NFTCard 
+                collection={selectedCollection}
+                isWatched={true}
+                onToggleWatch={(slug) => {
+                  toggleWatch(slug);
+                  setSelectedCollection(null);
+                }}
+                viewMode="grid"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
