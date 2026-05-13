@@ -63,7 +63,7 @@ export default function SaleItem({ sale }: SaleItemProps) {
         <div className="flex justify-between items-start mb-2">
           <div>
             <h3 className="text-lg font-bold text-white truncate">
-              {sale.name} #{sale.token_id}
+              {sale.name.includes('#') ? sale.name : `${sale.name} #${sale.token_id}`}
             </h3>
             <p className="text-xs text-blue-400 font-medium uppercase tracking-widest truncate">
               {sale.slug.replace(/-/g, ' ')}

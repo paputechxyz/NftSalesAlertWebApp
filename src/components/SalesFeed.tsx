@@ -28,8 +28,9 @@ export default function SalesFeed() {
 
     if (newSales.length === 1) {
       const sale = newSales[0];
+      const displayName = sale.name.includes('#') ? sale.name : `${sale.name} #${sale.token_id}`;
       new Notification('New NFT Sale!', {
-        body: `${sale.name} #${sale.token_id} sold for ${sale.formated_price_rounded}`,
+        body: `${displayName} sold for ${sale.formated_price_rounded}`,
         icon: sale.image_url || '/logo.png',
       });
     } else if (newSales.length > 1) {
