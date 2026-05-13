@@ -24,7 +24,7 @@ export default function ProfilePage() {
     );
   }
 
-  const isPro = tier >= 2;
+  const isPro = tier > 1;
 
   return (
     <main className="min-h-screen p-8 md:p-24 bg-[#0a0a0a]">

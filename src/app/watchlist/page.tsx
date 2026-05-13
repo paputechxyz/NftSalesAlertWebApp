@@ -13,7 +13,7 @@ export default function WatchlistPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const limit = tier >= 2 ? 20 : 1;
+  const limit = tier > 1 ? 20 : 1;
 
   const fetchWatchlist = async () => {
     if (!user) return;

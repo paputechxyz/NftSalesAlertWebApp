@@ -39,7 +39,7 @@ function LandingPageContent() {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  const limit = tier >= 2 ? 20 : 1;
+  const limit = tier > 1 ? 20 : 1;
 
   const fetchCollections = async () => {
     try {
@@ -301,7 +301,8 @@ function LandingPageContent() {
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
         title="Collection Limit Reached"
-        message={tier >= 2 
+        isPro={tier > 1}
+        message={tier > 1 
           ? "You've reached the Pro limit of 20 collections. Please remove a collection before adding a new one." 
           : "Free users can only track 1 collection. Download our Android app to upgrade to Pro and track up to 20 collections!"
         }

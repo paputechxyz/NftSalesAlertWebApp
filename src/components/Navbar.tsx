@@ -48,7 +48,7 @@ export default function Navbar() {
                       <UserIcon size={16} className="text-white" />
                     </div>
                   )}
-                  {tier >= 2 && (
+                  {tier > 1 && (
                     <div className="absolute -top-1 -right-1 bg-yellow-500 w-3 h-3 rounded-full border-2 border-[#0a0a0a]"></div>
                   )}
                 </div>
@@ -56,7 +56,7 @@ export default function Navbar() {
                   <p className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
                     {user.displayName?.split(' ')[0] || 'Profile'}
                   </p>
-                  {tier >= 2 && <p className="text-[10px] text-yellow-500 font-bold uppercase tracking-tighter">PRO</p>}
+                  {tier > 1 && <p className="text-[10px] text-yellow-500 font-bold uppercase tracking-tighter">PRO</p>}
                 </div>
               </Link>
               <button 

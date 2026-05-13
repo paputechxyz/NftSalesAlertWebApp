@@ -7,9 +7,10 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   message: string;
+  isPro?: boolean;
 }
 
-export default function UpgradeModal({ isOpen, onClose, title, message }: ModalProps) {
+export default function UpgradeModal({ isOpen, onClose, title, message, isPro = false }: ModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -36,21 +37,32 @@ export default function UpgradeModal({ isOpen, onClose, title, message }: ModalP
           </p>
 
           <div className="flex flex-col gap-3">
-            <a 
-              href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all"
-            >
-              <Download size={20} />
-              Upgrade on Google Play
-            </a>
-            <button 
-              onClick={onClose}
-              className="px-6 py-3 text-slate-400 hover:text-white transition-colors text-sm font-medium"
-            >
-              Maybe later
-            </button>
+            {!isPro ? (
+              <>
+                <a 
+                  href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all"
+                >
+                  <Download size={20} />
+                  Upgrade on Google Play
+                </a>
+                <button 
+                  onClick={onClose}
+                  className="px-6 py-3 text-slate-400 hover:text-white transition-colors text-sm font-medium"
+                >
+                  Maybe later
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={onClose}
+                className="px-6 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all"
+              >
+                Got it
+              </button>
+            )}
           </div>
         </div>
       </div>
