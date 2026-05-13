@@ -20,6 +20,8 @@ function LandingPageContent() {
   const [watchedSlugs, setWatchedSlugs] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [manualAddLoading, setManualAddLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Sync state with URL param
   useEffect(() => {
@@ -119,6 +121,47 @@ function LandingPageContent() {
     }
   };
 
+  const handleManualAdd = async (slug: string) => {
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+    
+    setManualAddLoading(true);
+    setErrorMessage(null);
+    const token = await getToken();
+
+    try {
+      const response = await fetch(getApiUrl(`/api/v1/watchlist/${user.uid}/${slug.trim().toLowerCase()}`), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        refreshWatchlistCount();
+        router.push('/watchlist');
+      } else if (response.status === 404) {
+        setErrorMessage("Collection slug not found on OpenSea. Please double check the slug.");
+      } else if (response.status === 400) {
+        const data = await response.json();
+        if (data.detail?.includes('limit')) {
+          setIsUpgradeModalOpen(true);
+        } else {
+          setErrorMessage(data.detail || "Failed to add collection.");
+        }
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
+    } catch (error) {
+      console.error('Error adding collection:', error);
+      setErrorMessage("Network error. Please try again.");
+    } finally {
+      setManualAddLoading(false);
+    }
+  };
+
   const filteredCollections = collections.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.slug.toLowerCase().includes(searchQuery.toLowerCase())
@@ -182,14 +225,48 @@ function LandingPageContent() {
             ))}
           </div>
         ) : filteredCollections.length === 0 ? (
-          <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
-            <p className="text-slate-400 text-lg">No collections found matching "{searchQuery}"</p>
-            <button 
-              onClick={() => handleSearch('')}
-              className="mt-4 text-blue-400 font-bold hover:underline"
-            >
-              Clear filter
-            </button>
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center py-16 bg-white/5 rounded-[2rem] border border-dashed border-white/10 px-8">
+              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Search size={32} className="text-blue-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">No results for "{searchQuery}"</h3>
+              <p className="text-slate-400 mb-8 max-w-md mx-auto">
+                Can't find the collection? You can add it manually using its OpenSea slug.
+              </p>
+
+              <div className="bg-[#1a1a1a] rounded-2xl p-6 text-left mb-8 border border-white/5">
+                <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">How to find the slug:</h4>
+                <div className="space-y-4 text-sm text-slate-400">
+                  <p>1. Go to the collection page on <span className="text-blue-400">OpenSea.io</span></p>
+                  <p>2. Look at the URL in your browser</p>
+                  <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono break-all">
+                    https://opensea.io/collection/<span className="text-blue-400 font-bold">boredapeyachtclub</span>
+                  </div>
+                  <p>3. The last part is your slug: <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded">boredapeyachtclub</span></p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={() => handleManualAdd(searchQuery)}
+                  disabled={manualAddLoading}
+                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
+                >
+                  {manualAddLoading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <>Add "{searchQuery}" to Watchlist</>
+                  )}
+                </button>
+                <button 
+                  onClick={() => handleSearch('')}
+                  className="text-slate-500 hover:text-white transition-colors"
+                >
+                  Clear search
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -204,6 +281,21 @@ function LandingPageContent() {
           </div>
         )}
       </div>
+
+      {/* Error Popup */}
+      {errorMessage && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[110] animate-in fade-in slide-in-from-bottom-4">
+          <div className="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
+            <span className="font-medium">{errorMessage}</span>
+            <button 
+              onClick={() => setErrorMessage(null)}
+              className="hover:bg-black/10 rounded-lg p-1 transition-colors"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <UpgradeModal 
         isOpen={isUpgradeModalOpen}
