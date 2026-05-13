@@ -88,7 +88,7 @@ export default function ProfilePage() {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white mb-4">Upgrade to Pro</h2>
                 <p className="text-slate-400 mb-6">
-                  You are currently on the <span className="text-white font-semibold">Free Tier</span>. You can only receive notifications for your <span className="text-blue-400 font-bold">most recent collection</span>.
+                  You are currently on the <span className="text-white font-semibold">Free Tier</span>. You can only receive notifications for <span className="text-blue-400 font-bold">1 collection</span>.
                 </p>
                 
                 <div className="space-y-4 mb-8">
@@ -98,16 +98,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <p className="text-white font-medium">Unlock 20 Collections</p>
-                      <p className="text-slate-500 text-sm">Track more projects and never miss a flip.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1 p-1 bg-green-500/20 rounded-full">
-                      <Star size={14} className="text-green-500" />
-                    </div>
-                    <div>
-                      <p className="text-white font-medium">Real-Time Push Notifications</p>
-                      <p className="text-slate-500 text-sm">Get notified the second a sale happens.</p>
+                      <p className="text-slate-500 text-sm">Track more collections and never miss NFT sales.</p>
                     </div>
                   </div>
                 </div>
@@ -120,11 +111,8 @@ export default function ProfilePage() {
                     className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0077cc] hover:bg-[#005fa3] text-white font-bold rounded-xl transition-all"
                   >
                     <Download size={18} />
-                    Download App to Upgrade
+                    Download from Google Play to Upgrade
                   </a>
-                  <p className="text-slate-500 text-xs flex items-center justify-center md:justify-start">
-                    * Subscriptions are managed via Google Play Store
-                  </p>
                 </div>
               </div>
               
@@ -154,6 +142,8 @@ export default function ProfilePage() {
             <p className="text-slate-400 mb-4 italic">"The most powerful NFT sales tracker in your pocket."</p>
             <a 
               href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-blue-400 text-sm font-bold flex items-center gap-1 hover:underline"
             >
               Learn more on Google Play <ExternalLink size={14} />

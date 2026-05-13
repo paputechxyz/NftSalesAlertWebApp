@@ -4,12 +4,16 @@ import { useState, useEffect } from 'react';
 import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useAuth } from '@/context/AuthContext';
 import { getApiUrl } from '@/lib/api';
+import UpgradeModal from '@/components/UpgradeModal';
 
 export default function LandingPage() {
-  const { user, getToken } = useAuth();
+  const { user, tier, getToken, refreshWatchlistCount } = useAuth();
   const [collections, setCollections] = useState<NFTCollection[]>([]);
   const [watchedSlugs, setWatchedSlugs] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+
+  const limit = tier >= 2 ? 20 : 1;
 
   const fetchCollections = async () => {
     try {
@@ -59,6 +63,13 @@ export default function LandingPage() {
     if (!user) return;
     
     const isWatched = watchedSlugs.has(slug);
+    
+    // Check limit if adding
+    if (!isWatched && watchedSlugs.size >= limit) {
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+
     const method = isWatched ? 'DELETE' : 'POST';
     const token = await getToken();
 
@@ -77,6 +88,7 @@ export default function LandingPage() {
           else next.add(slug);
           return next;
         });
+        refreshWatchlistCount();
       }
     } catch (error) {
       console.error('Error toggling watchlist:', error);
@@ -90,8 +102,11 @@ export default function LandingPage() {
           <h1 className="text-5xl md:text-7xl font-bold gradient-text mb-4 tracking-tighter">
             NFT Sales Alert
           </h1>
-          <p className="text-slate-400 text-lg mb-8">
+          <p className="text-slate-400 text-lg">
             Get instant push notifications for NFT sales and floor price changes on OpenSea.
+          </p>
+          <p className="text-blue-400/80 text-md mb-8 font-medium italic">
+            Watch your favourite NFT collection for free, forever.
           </p>
           <div className="flex flex-col items-center gap-4 mb-12">
             <a
@@ -130,6 +145,16 @@ export default function LandingPage() {
           </div>
         )}
       </div>
+
+      <UpgradeModal 
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        title="Collection Limit Reached"
+        message={tier >= 2 
+          ? "You've reached the Pro limit of 20 collections. Please remove a collection before adding a new one." 
+          : "Free users can only track 1 collection. Download our Android app to upgrade to Pro and track up to 20 collections!"
+        }
+      />
     </main>
   );
 }

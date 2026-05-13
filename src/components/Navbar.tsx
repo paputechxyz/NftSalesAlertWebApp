@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Star, LogOut, User as UserIcon } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, login, logout, tier } = useAuth();
+  const { user, login, logout, tier, watchlistCount } = useAuth();
 
   return (
     <nav className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
@@ -17,7 +17,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-6">
           <Link href="/watchlist" className="text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-2">
-            <Star size={16} />
+            <Star size={16} className={watchlistCount > 0 ? "text-yellow-500" : ""} fill={watchlistCount > 0 ? "currentColor" : "none"} />
             Watchlist
           </Link>
 

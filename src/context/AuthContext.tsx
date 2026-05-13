@@ -18,6 +18,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   getToken: () => Promise<string | null>;
   refreshTier: () => Promise<void>;
+  watchlistCount: number;
+  refreshWatchlistCount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,11 +27,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [tier, setTier] = useState<number>(1);
+  const [watchlistCount, setWatchlistCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+
+  const fetchWatchlistCount = async (currentUser: User) => {
+    try {
+      const token = await getIdToken(currentUser);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/watchlist/${currentUser.uid}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setWatchlistCount(Array.isArray(data) ? data.length : 0);
+      }
+    } catch (error) {
+      console.error("Error fetching watchlist count", error);
+    }
+  };
 
   const fetchTier = async (currentUser: User) => {
     try {
       const token = await getIdToken(currentUser);
+      // Fetch both tier and watchlist count
+      fetchWatchlistCount(currentUser);
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/user/${currentUser.uid}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -99,7 +121,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, tier, loading, login, logout, getToken, refreshTier }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      tier, 
+      loading, 
+      login, 
+      logout, 
+      getToken, 
+      refreshTier,
+      watchlistCount,
+      refreshWatchlistCount: async () => { if (user) await fetchWatchlistCount(user); }
+    }}>
       {children}
     </AuthContext.Provider>
   );

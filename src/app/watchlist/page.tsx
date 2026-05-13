@@ -8,10 +8,12 @@ import { Loader2 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 
 export default function WatchlistPage() {
-  const { user, loading: authLoading, getToken } = useAuth();
+  const { user, tier, loading: authLoading, getToken, refreshWatchlistCount } = useAuth();
   const [watchlist, setWatchlist] = useState<NFTCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const limit = tier >= 2 ? 20 : 1;
 
   const fetchWatchlist = async () => {
     if (!user) return;
@@ -68,6 +70,7 @@ export default function WatchlistPage() {
 
       if (response.ok) {
         setWatchlist(prev => prev.filter(item => item.slug !== slug));
+        refreshWatchlistCount();
       }
     } catch (error) {
       console.error('Error removing from watchlist:', error);
@@ -85,13 +88,21 @@ export default function WatchlistPage() {
   return (
     <main className="min-h-screen p-8 md:p-24 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tighter">
-            Your Watchlist
-          </h1>
-          <p className="text-slate-400">
-            Keep track of your favorite collections and their latest performance.
-          </p>
+        <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tighter">
+              Your Watchlist
+            </h1>
+            <p className="text-slate-400">
+              Keep track of your favorite collections and their latest performance.
+            </p>
+          </div>
+          <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
+            <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Watchlist Limit</p>
+            <p className="text-2xl font-bold text-white">
+              {watchlist.length} <span className="text-slate-600">/ {limit}</span>
+            </p>
+          </div>
         </header>
 
         {watchlist.length === 0 ? (
