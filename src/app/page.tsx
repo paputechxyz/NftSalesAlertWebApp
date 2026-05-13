@@ -243,7 +243,7 @@ function LandingPageContent() {
               <div className="bg-[#1a1a1a] rounded-2xl p-6 text-left mb-8 border border-white/5">
                 <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">How to find the slug:</h4>
                 <div className="space-y-4 text-sm text-slate-400">
-                  <p>1. Go to the collection page on <span className="text-blue-400">OpenSea.io</span></p>
+                  <p>1. Go to the collection page on <a href="https://opensea.io" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">OpenSea.io</a></p>
                   <p>2. Look at the URL in your browser</p>
                   <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono break-all">
                     https://opensea.io/collection/<span className="text-blue-400 font-bold">boredapeyachtclub</span>
