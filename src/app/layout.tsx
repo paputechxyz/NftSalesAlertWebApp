@@ -14,7 +14,30 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "NFT Sales Alert | Real-Time NFT Market Insights",
-  description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections.",
+  description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",
+  openGraph: {
+    title: "NFT Sales Alert | Real-Time NFT Market Insights",
+    description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",
+    url: "https://nft-sales-alert.vercel.app", // Placeholder, will be replaced by actual URL if available
+    siteName: "NFT Sales Alert",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "NFT Sales Alert Social Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NFT Sales Alert | Real-Time NFT Market Insights",
+    description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",
+    images: ["/og-image.jpg"],
+    creator: "@nftsalesalert",
+  },
 };
 
 import { AuthProvider } from "@/context/AuthContext";

@@ -11,8 +11,18 @@ export default function Navbar() {
   return (
     <nav className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold gradient-text tracking-tighter">
-          NFT Sales Alert
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 overflow-hidden rounded-xl">
+            <Image 
+              src="/logo.png" 
+              alt="NFT Sales Alert Logo" 
+              fill
+              className="object-contain group-hover:scale-110 transition-transform duration-300"
+            />
+          </div>
+          <span className="text-xl font-bold gradient-text tracking-tighter">
+            NFT Sales Alert
+          </span>
         </Link>
 
         <div className="flex items-center gap-6">
