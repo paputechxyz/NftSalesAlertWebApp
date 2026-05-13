@@ -48,6 +48,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { UIProvider } from "@/context/UIContext";
 import Navbar from "@/components/Navbar";
 import BackToTop from "@/components/BackToTop";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -63,8 +64,11 @@ export default function RootLayout({
         <AuthProvider>
           <UIProvider>
             <Navbar />
-            {children}
+            <div className="flex-grow">
+              {children}
+            </div>
             <BackToTop />
+            <Footer />
           </UIProvider>
         </AuthProvider>
       </body>
