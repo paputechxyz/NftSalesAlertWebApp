@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold gradient-text tracking-tighter">
-          NFT Analytics
+          NFT Sales Alert
         </Link>
 
         <div className="flex items-center gap-6">

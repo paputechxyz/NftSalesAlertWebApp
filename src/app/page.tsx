@@ -88,11 +88,27 @@ export default function LandingPage() {
       <div className="max-w-7xl mx-auto">
         <header className="mb-16 text-center">
           <h1 className="text-5xl md:text-7xl font-bold gradient-text mb-4 tracking-tighter">
-            NFT Sales Analytics
+            NFT Sales Alert
           </h1>
           <p className="text-slate-400 text-lg mb-8">
-            Real-time insights into the most active NFT collections
+            Get instant push notifications for NFT sales and floor price changes on OpenSea.
           </p>
+          <div className="flex flex-col items-center gap-4 mb-12">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#0077cc] hover:bg-[#005fa3] text-white font-bold rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(0,119,204,0.4)]"
+            >
+              <svg viewBox="30 336.7 512 512" width="24" height="24" fill="currentColor">
+                <path d="M119.2 337L322.7 540.5 119.2 744c-2.4-1.2-4.4-3.2-5.4-5.8-1.1-2.6-1-5.6.3-8.2l91.4-192.5L113 346.5c-1.3-2.6-1.4-5.6-.3-8.2 1.1-2.6 3-4.6 5.4-5.8l1.1.5zM433.5 528.2l-87.7-43.8-23.1 23.1 87.7 43.8c4.3 2.2 8.3 1.1 10.6-2.5 2.3-3.6 2.3-8.2-.5-12.6l-7-8zM128 348.5l202.4 101.2-31.5 31.5L128 348.5zm0 384l170.9-132.5 31.5 31.5L128 732.5zM356.4 476.3l-24.8 24.8-24.8-24.8L402.7 348.5c4.3-2.2 8.3-1.1 10.6 2.5 2.3 3.6 2.3 8.2-.5 12.6l-56.4 112.7z"/>
+              </svg>
+              <span>Download on Google Play</span>
+            </a>
+            <p className="text-slate-500 text-sm">
+              * Push notifications are currently available only on the Android app.
+            </p>
+          </div>
         </header>
 
         {loading && collections.length === 0 ? (

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NFT Sales Analytics | Real-Time NFT Market Insights",
+  title: "NFT Sales Alert | Real-Time NFT Market Insights",
   description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections.",
 };
 
