@@ -1,23 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useUI } from '@/context/UIContext';
 import { usePathname } from 'next/navigation';
-import { Star, LogOut, User as UserIcon, LayoutGrid, List } from 'lucide-react';
+import { Star, LogOut, User as UserIcon, LayoutGrid, List, Menu, X as CloseIcon } from 'lucide-react';
 
 export default function Navbar() {
   const { user, login, logout, tier, watchlistCount } = useAuth();
   const { viewMode, setViewMode } = useUI();
   const pathname = usePathname();
   const isWatchlistPage = pathname === '/watchlist';
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <nav className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 overflow-hidden rounded-xl">
+          <div className="relative w-9 h-9 overflow-hidden rounded-xl">
             <Image 
               src="/logo.png" 
               alt="NFT Sales Alert Logo" 
@@ -25,12 +27,13 @@ export default function Navbar() {
               className="object-contain group-hover:scale-110 transition-transform duration-300"
             />
           </div>
-          <span className="text-xl font-bold gradient-text tracking-tighter">
+          <span className="text-lg font-bold gradient-text tracking-tighter sm:block hidden">
             NFT Sales Alert
           </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-6">
           {!isWatchlistPage && (
             <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
               <button
@@ -105,11 +108,104 @@ export default function Navbar() {
               className="px-4 py-2 bg-white text-black text-sm font-semibold rounded-full hover:bg-slate-200 transition-all flex items-center gap-2"
             >
               <UserIcon size={16} />
-              Login with Google
+              Login
             </button>
           )}
         </div>
+
+        {/* Mobile Hamburger Button */}
+        <div className="md:hidden flex items-center gap-4">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 text-slate-400 hover:text-white bg-white/5 rounded-xl border border-white/10"
+          >
+            {isMenuOpen ? <CloseIcon size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl animate-in slide-in-from-top-4 duration-200">
+          <div className="p-6 space-y-6">
+            {!isWatchlistPage && (
+              <div className="bg-white/5 rounded-2xl border border-white/10 p-4">
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3 px-1">View Mode</p>
+                <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all ${
+                      viewMode === 'grid' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
+                        : 'text-slate-500'
+                    }`}
+                  >
+                    <LayoutGrid size={16} />
+                    <span className="text-sm font-bold">Grid</span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all ${
+                      viewMode === 'list' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
+                        : 'text-slate-500'
+                    }`}
+                  >
+                    <List size={16} />
+                    <span className="text-sm font-bold">List</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <Link 
+                href="/watchlist" 
+                onClick={() => setIsMenuOpen(false)}
+                className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10 text-slate-300 active:bg-blue-500 active:text-white transition-all"
+              >
+                <Star size={24} className={watchlistCount > 0 ? "text-yellow-500" : ""} fill={watchlistCount > 0 ? "currentColor" : "none"} />
+                <span className="text-sm font-bold">Watchlist</span>
+              </Link>
+              
+              {user ? (
+                <Link 
+                  href="/profile" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10 text-slate-300 active:bg-blue-500 active:text-white transition-all"
+                >
+                  <UserIcon size={24} />
+                  <span className="text-sm font-bold">Profile</span>
+                </Link>
+              ) : (
+                <button 
+                  onClick={() => {
+                    login();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10 text-slate-300 active:bg-blue-500 active:text-white transition-all"
+                >
+                  <UserIcon size={24} />
+                  <span className="text-sm font-bold">Login</span>
+                </button>
+              )}
+            </div>
+
+            {user && (
+              <button 
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 p-4 bg-red-500/10 text-red-500 rounded-2xl border border-red-500/20 font-bold"
+              >
+                <LogOut size={20} />
+                Logout
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

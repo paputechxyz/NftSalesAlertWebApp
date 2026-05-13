@@ -124,7 +124,7 @@ export default function WatchlistPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             {/* Left Column: Watchlist (Smaller) */}
-            <div className="lg:col-span-4 xl:col-span-3 space-y-8 sticky top-24">
+            <div className="lg:col-span-4 xl:col-span-3 space-y-8 lg:sticky lg:top-24">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-white tracking-tight">Watchlist</h2>
                 <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-lg">
