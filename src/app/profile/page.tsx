@@ -221,16 +221,16 @@ function ProfileContent() {
                       className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#635BFF] hover:bg-[#4B44CC] disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-lg"
                     >
                       <CreditCard size={18} />
-                      {isCheckingOut ? 'Loading...' : 'Subscribe Monthly ($5)'}
+                      {isCheckingOut ? 'Loading...' : 'Subscribe Monthly ($4.99)'}
                     </button>
                     <button 
                       onClick={() => handleStripeCheckout('yearly')}
                       disabled={isCheckingOut}
                       className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#0a2540] hover:bg-[#07192a] disabled:opacity-50 border border-[#635BFF]/30 text-white font-bold rounded-xl transition-all shadow-lg relative overflow-hidden"
                     >
-                      <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Save $10</div>
+                      <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Save 16%</div>
                       <CreditCard size={18} />
-                      {isCheckingOut ? 'Loading...' : 'Subscribe Yearly ($50)'}
+                      {isCheckingOut ? 'Loading...' : 'Subscribe Yearly ($49.99)'}
                     </button>
                   </div>
                   
