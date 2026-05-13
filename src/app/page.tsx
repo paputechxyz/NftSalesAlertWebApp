@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getApiUrl } from '@/lib/api';
 import UpgradeModal from '@/components/UpgradeModal';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, X } from 'lucide-react';
+import { Search, X, AlertCircle } from 'lucide-react';
 import { Suspense } from 'react';
 import AuthModal from '@/components/AuthModal';
 import { useUI } from '@/context/UIContext';
@@ -24,7 +24,7 @@ function LandingPageContent() {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [manualAddLoading, setManualAddLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<React.ReactNode | string | null>(null);
   const { viewMode } = useUI();
 
   // Sync state with URL param
@@ -150,7 +150,9 @@ function LandingPageContent() {
         refreshWatchlistCount();
         router.push('/watchlist');
       } else if (response.status === 404) {
-        setErrorMessage("Collection slug not found on OpenSea. Please double check the slug.");
+        setErrorMessage(
+          <span>Collection slug <span className="text-blue-400 font-mono font-bold">{slug}</span> not found on OpenSea. Please double check the slug.</span>
+        );
       } else if (response.status === 400) {
         const data = await response.json();
         if (data.detail?.includes('limit')) {
@@ -223,6 +225,22 @@ function LandingPageContent() {
               </button>
             )}
           </div>
+
+          {searchQuery && filteredCollections.length === 0 && !loading && (
+            <div className="max-w-xl mx-auto -mt-8 mb-16 animate-in fade-in slide-in-from-top-4">
+              <button 
+                onClick={() => handleManualAdd(searchQuery)}
+                disabled={manualAddLoading}
+                className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-blue-500/20 border border-white/10"
+              >
+                {manualAddLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>Add "{searchQuery}" to Watchlist</>
+                )}
+              </button>
+            </div>
+          )}
         </header>
 
         {loading && collections.length === 0 ? (
@@ -296,16 +314,28 @@ function LandingPageContent() {
         )}
       </div>
 
-      {/* Error Popup */}
+      {/* Error Modal */}
       {errorMessage && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[110] animate-in fade-in slide-in-from-bottom-4">
-          <div className="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
-            <span className="font-medium">{errorMessage}</span>
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setErrorMessage(null)}
+        >
+          <div 
+            className="w-full max-w-sm glass-card p-8 animate-in zoom-in-95 duration-200 border-red-500/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-500">
+              <AlertCircle size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-white text-center mb-4">Error</h3>
+            <p className="text-slate-400 text-center mb-8">
+              {errorMessage}
+            </p>
             <button 
               onClick={() => setErrorMessage(null)}
-              className="hover:bg-black/10 rounded-lg p-1 transition-colors"
+              className="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
             >
-              <X size={18} />
+              Got it
             </button>
           </div>
         </div>
