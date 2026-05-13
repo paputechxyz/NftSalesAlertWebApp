@@ -15,7 +15,7 @@ export default function SalesFeed() {
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
   const latestSaleDateRef = useRef<number>(0);
-  const pageSize = 20;
+  const pageSize = 50;
 
   const requestNotificationPermission = useCallback(async () => {
     if ('Notification' in window && Notification.permission === 'default') {

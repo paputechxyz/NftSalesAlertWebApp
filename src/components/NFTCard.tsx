@@ -57,12 +57,6 @@ export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode
           <p className="text-xs text-slate-500 uppercase tracking-widest truncate">{collection.slug}</p>
         </div>
 
-        <div className="hidden md:flex items-center gap-8 flex-shrink-0">
-          <ListStat label="Floor" value={`${collection.floor_price?.toFixed(3) || '0'} ${collection.floor_price_symbol}`} />
-          <ListStat label="Volume" value={formatCompact(collection.volume)} />
-          <ListStat label="Sales" value={collection.sales?.toString() || '0'} />
-        </div>
-
         <div className="flex items-center gap-4 flex-shrink-0 ml-auto">
           {user && (
             <button
