@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 import { useUI } from '@/context/UIContext';
+import SalesFeed from '@/components/SalesFeed';
 
 export default function WatchlistPage() {
   const { user, tier, loading: authLoading, getToken, refreshWatchlistCount } = useAuth();
@@ -118,19 +119,25 @@ export default function WatchlistPage() {
             </button>
           </div>
         ) : (
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
-            : "flex flex-col gap-4"
-          }>
-            {watchlist.map((collection) => (
-              <NFTCard 
-                key={collection.slug} 
-                collection={collection} 
-                isWatched={true}
-                onToggleWatch={toggleWatch}
-                viewMode={viewMode}
-              />
-            ))}
+          <div className="space-y-16">
+            <div className={viewMode === 'grid' 
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+              : "flex flex-col gap-4"
+            }>
+              {watchlist.map((collection) => (
+                <NFTCard 
+                  key={collection.slug} 
+                  collection={collection} 
+                  isWatched={true}
+                  onToggleWatch={toggleWatch}
+                  viewMode={viewMode}
+                />
+              ))}
+            </div>
+
+            <div className="border-t border-white/5 pt-16">
+              <SalesFeed />
+            </div>
           </div>
         )}
       </div>
