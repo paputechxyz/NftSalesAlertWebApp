@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { Star, LogOut, User as UserIcon } from 'lucide-react';
+import { useUI } from '@/context/UIContext';
+import { Star, LogOut, User as UserIcon, LayoutGrid, List } from 'lucide-react';
 
 export default function Navbar() {
   const { user, login, logout, tier, watchlistCount } = useAuth();
+  const { viewMode, setViewMode } = useUI();
 
   return (
     <nav className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
@@ -30,6 +32,31 @@ export default function Navbar() {
             <Star size={16} className={watchlistCount > 0 ? "text-yellow-500" : ""} fill={watchlistCount > 0 ? "currentColor" : "none"} />
             Watchlist
           </Link>
+
+          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 ml-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-all ${
+                viewMode === 'grid' 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'text-slate-500 hover:text-white'
+              }`}
+              title="Grid View"
+            >
+              <LayoutGrid size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-all ${
+                viewMode === 'list' 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'text-slate-500 hover:text-white'
+              }`}
+              title="List View"
+            >
+              <List size={16} />
+            </button>
+          </div>
 
           {user ? (
             <div className="flex items-center gap-4 pl-4 border-l border-white/10">

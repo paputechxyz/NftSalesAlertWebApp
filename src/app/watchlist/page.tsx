@@ -6,11 +6,13 @@ import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
+import { useUI } from '@/context/UIContext';
 
 export default function WatchlistPage() {
   const { user, tier, loading: authLoading, getToken, refreshWatchlistCount } = useAuth();
   const [watchlist, setWatchlist] = useState<NFTCollection[]>([]);
   const [loading, setLoading] = useState(true);
+  const { viewMode } = useUI();
   const router = useRouter();
 
   const limit = tier > 1 ? 20 : 1;
@@ -116,13 +118,17 @@ export default function WatchlistPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+            : "flex flex-col gap-4"
+          }>
             {watchlist.map((collection) => (
               <NFTCard 
                 key={collection.slug} 
                 collection={collection} 
                 isWatched={true}
                 onToggleWatch={toggleWatch}
+                viewMode={viewMode}
               />
             ))}
           </div>

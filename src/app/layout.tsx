@@ -45,6 +45,7 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/context/AuthContext";
+import { UIProvider } from "@/context/UIContext";
 import Navbar from "@/components/Navbar";
 
 export default function RootLayout({
@@ -59,8 +60,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Navbar />
-          {children}
+          <UIProvider>
+            <Navbar />
+            {children}
+          </UIProvider>
         </AuthProvider>
       </body>
     </html>

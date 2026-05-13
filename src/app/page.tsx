@@ -9,6 +9,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import { Suspense } from 'react';
 import AuthModal from '@/components/AuthModal';
+import { useUI } from '@/context/UIContext';
 
 function LandingPageContent() {
   const { user, tier, getToken, refreshWatchlistCount } = useAuth();
@@ -24,6 +25,7 @@ function LandingPageContent() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [manualAddLoading, setManualAddLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { viewMode } = useUI();
 
   // Sync state with URL param
   useEffect(() => {
@@ -224,9 +226,12 @@ function LandingPageContent() {
         </header>
 
         {loading && collections.length === 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+            : "flex flex-col gap-4"
+          }>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="glass-card h-96 animate-shimmer"></div>
+              <div key={i} className={`glass-card animate-shimmer ${viewMode === 'grid' ? 'h-96' : 'h-24'}`}></div>
             ))}
           </div>
         ) : filteredCollections.length === 0 ? (
@@ -274,13 +279,17 @@ function LandingPageContent() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+            : "flex flex-col gap-4"
+          }>
             {filteredCollections.map((collection) => (
               <NFTCard 
                 key={collection.slug} 
                 collection={collection} 
                 isWatched={watchedSlugs.has(collection.slug)}
                 onToggleWatch={toggleWatch}
+                viewMode={viewMode}
               />
             ))}
           </div>

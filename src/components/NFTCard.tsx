@@ -20,10 +20,62 @@ interface NFTCardProps {
   collection: NFTCollection;
   isWatched: boolean;
   onToggleWatch: (slug: string) => void;
+  viewMode?: 'grid' | 'list';
 }
 
-export default function NFTCard({ collection, isWatched, onToggleWatch }: NFTCardProps) {
+export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode = 'grid' }: NFTCardProps) {
   const { user } = useAuth();
+
+  if (viewMode === 'list') {
+    return (
+      <div className="glass-card overflow-hidden group flex items-center p-4 gap-6">
+        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl">
+          {collection.image_url ? (
+            <Image
+              src={collection.image_url}
+              alt={collection.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-800 flex items-center justify-center text-[10px] text-slate-600">
+              No Image
+            </div>
+          )}
+        </div>
+
+        <div className="flex-grow min-w-0">
+          <h3 className="text-lg font-bold text-white truncate">{collection.name}</h3>
+          <p className="text-xs text-slate-500 uppercase tracking-widest truncate">{collection.slug}</p>
+        </div>
+
+        <div className="hidden md:flex items-center gap-8 flex-shrink-0">
+          <ListStat label="Floor" value={`${collection.floor_price?.toFixed(3) || '0'} ${collection.floor_price_symbol}`} />
+          <ListStat label="Volume" value={formatCompact(collection.volume)} />
+          <ListStat label="Sales" value={collection.sales?.toString() || '0'} />
+        </div>
+
+        <div className="flex items-center gap-4 flex-shrink-0 ml-auto">
+          {user && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleWatch(collection.slug);
+              }}
+              className={`p-2 rounded-full transition-all ${
+                isWatched 
+                  ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' 
+                  : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+              }`}
+              title={isWatched ? "Remove from watchlist" : "Add to watchlist"}
+            >
+              <Star size={18} fill={isWatched ? "currentColor" : "none"} />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="glass-card overflow-hidden group">
@@ -76,6 +128,15 @@ export default function NFTCard({ collection, isWatched, onToggleWatch }: NFTCar
           <Stat label="Market Cap" value={`${formatCompact(collection.market_cap)} ${collection.floor_price_symbol}`} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function ListStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="w-24">
+      <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-0.5">{label}</p>
+      <p className="text-sm font-medium text-slate-200">{value}</p>
     </div>
   );
 }
