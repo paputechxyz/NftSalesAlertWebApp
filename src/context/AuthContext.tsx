@@ -20,6 +20,11 @@ interface AuthContextType {
   refreshTier: () => Promise<void>;
   watchlistCount: number;
   refreshWatchlistCount: () => Promise<void>;
+  subscriptionDetails: {
+    expiryDate: string | null;
+    cancelAtPeriodEnd: boolean;
+    provider: string | null;
+  } | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [tier, setTier] = useState<number>(1);
   const [watchlistCount, setWatchlistCount] = useState<number>(0);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<AuthContextType['subscriptionDetails']>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchWatchlistCount = async (currentUser: User) => {
@@ -60,6 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         setTier(data.tier || 1);
+        setSubscriptionDetails({
+          expiryDate: data.subscription_expiry_date,
+          cancelAtPeriodEnd: data.cancel_at_period_end,
+          provider: data.subscription_provider,
+        });
       } else if (response.status === 404) {
         // If user not found, create them
         await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/user`, {
@@ -130,7 +141,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       getToken, 
       refreshTier,
       watchlistCount,
-      refreshWatchlistCount: async () => { if (user) await fetchWatchlistCount(user); }
+      refreshWatchlistCount: async () => { if (user) await fetchWatchlistCount(user); },
+      subscriptionDetails
     }}>
       {children}
     </AuthContext.Provider>

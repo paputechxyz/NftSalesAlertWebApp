@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NFT Sales Alert | Real-Time NFT Market Insights",
-  description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  title: 'NFT Sales Alert - Real-time NFT Market Tracker',
+  description: 'Track real-time NFT sales across multiple marketplaces. Get instant alerts, filter by collections, and monitor the NFT market in one place.',
   openGraph: {
     title: "NFT Sales Alert | Real-Time NFT Market Insights",
     description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",

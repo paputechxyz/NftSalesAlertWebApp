@@ -24,6 +24,7 @@ export default function Navbar() {
               src="/logo.png" 
               alt="NFT Sales Alert Logo" 
               fill
+              sizes="36px"
               className="object-contain group-hover:scale-110 transition-transform duration-300"
             />
           </div>

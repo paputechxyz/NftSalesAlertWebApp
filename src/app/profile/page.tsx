@@ -1,14 +1,103 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { User, Shield, Star, Rocket, Download, ExternalLink } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { User, Shield, Star, Rocket, Download, ExternalLink, CreditCard } from 'lucide-react';
 import Image from 'next/image';
 
-export default function ProfilePage() {
-  const { user, tier, loading } = useAuth();
+function ProfileContent() {
+  const { user, tier, loading, refreshTier, subscriptionDetails } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const checkoutStatus = searchParams.get('checkout');
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isManaging, setIsManaging] = useState(false);
+
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    try {
+      setIsManaging(true);
+      const token = await user.getIdToken();
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
+      const response = await fetch(`${API_URL}/api/v1/stripe/create-portal-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          fid: user.uid,
+          return_url: window.location.href
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const data = await response.json();
+      if (data.portal_url) {
+        window.open(data.portal_url, '_blank');
+      }
+    } catch (error) {
+      console.error('Portal error:', error);
+      alert('Failed to open subscription management. Please try again.');
+    } finally {
+      setIsManaging(false);
+    }
+  };
+
+  const handleStripeCheckout = async (plan: 'monthly' | 'yearly') => {
+    if (!user) return;
+    try {
+      setIsCheckingOut(true);
+      const token = await user.getIdToken();
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
+      const response = await fetch(`${API_URL}/api/v1/stripe/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          plan,
+          fid: user.uid,
+          success_url: `${window.location.origin}/profile?checkout=success`,
+          cancel_url: `${window.location.origin}/profile?checkout=cancel`
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to create checkout session');
+      }
+
+      const data = await response.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to initiate checkout. Please try again.');
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  useEffect(() => {
+    if (checkoutStatus === 'success' && user) {
+      // Refresh tier to see if webhook processed
+      refreshTier();
+      // Try again after 3 seconds in case webhook was slightly delayed
+      const timer = setTimeout(() => {
+        refreshTier();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [checkoutStatus, user]); // Excluded refreshTier from deps to avoid re-renders if it's not memoized
 
   useEffect(() => {
     if (!loading && !user) {
@@ -80,6 +169,45 @@ export default function ProfilePage() {
               <p className="text-white/90 text-lg mb-6 max-w-xl">
                 You are currently on the Pro plan. You can track up to <span className="font-bold">20 NFT collections</span> with instant push notifications.
               </p>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex-1">
+                  {subscriptionDetails && subscriptionDetails.expiryDate ? (
+                    <>
+                      <p className="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">
+                        {subscriptionDetails.cancelAtPeriodEnd ? 'Subscription Cancels On' : 'Next Billing Date'}
+                      </p>
+                      <p className="text-white text-xl font-medium">
+                        {new Date(subscriptionDetails.expiryDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                      <p className="text-white/40 text-sm mt-1">
+                        {subscriptionDetails.cancelAtPeriodEnd ? 'Your access will continue until this date.' : 'Your subscription will automatically renew.'}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">Status</p>
+                      <p className="text-white text-xl font-medium">Pro Subscription Active</p>
+                      <p className="text-white/40 text-sm mt-1">Manage your billing and renewal below.</p>
+                    </>
+                  )}
+                </div>
+                
+                {subscriptionDetails?.provider === 'stripe' && (
+                  <button 
+                    onClick={handleManageSubscription}
+                    disabled={isManaging}
+                    className="px-6 py-3 bg-white text-amber-700 hover:bg-amber-50 disabled:opacity-50 font-bold rounded-xl transition-all shadow-lg flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <CreditCard size={18} />
+                    {isManaging ? 'Loading...' : 'Manage Subscription'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ) : (
@@ -103,7 +231,33 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button 
+                      onClick={() => handleStripeCheckout('monthly')}
+                      disabled={isCheckingOut}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#635BFF] hover:bg-[#4B44CC] disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-lg"
+                    >
+                      <CreditCard size={18} />
+                      {isCheckingOut ? 'Loading...' : 'Subscribe Monthly ($5)'}
+                    </button>
+                    <button 
+                      onClick={() => handleStripeCheckout('yearly')}
+                      disabled={isCheckingOut}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#0a2540] hover:bg-[#07192a] disabled:opacity-50 border border-[#635BFF]/30 text-white font-bold rounded-xl transition-all shadow-lg relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Save $10</div>
+                      <CreditCard size={18} />
+                      {isCheckingOut ? 'Loading...' : 'Subscribe Yearly ($50)'}
+                    </button>
+                  </div>
+                  
+                  <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-white/10"></div>
+                    <span className="flex-shrink-0 mx-4 text-slate-500 text-sm">or</span>
+                    <div className="flex-grow border-t border-white/10"></div>
+                  </div>
+
                   <a 
                     href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
                     target="_blank"
@@ -127,7 +281,7 @@ export default function ProfilePage() {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="glass-card p-6 rounded-2xl border-white/5">
             <h3 className="text-lg font-bold text-white mb-2">Account Status</h3>
-            <p className="text-slate-400 text-sm mb-4">Manage your subscription in the Google Play.</p>
+            <p className="text-slate-400 text-sm mb-4">Manage your subscription in the Google Play or Stripe.</p>
             <div className="flex justify-between items-center py-3 border-t border-white/5">
               <span className="text-slate-300">Email Verified</span>
               <span className="text-green-500 text-sm font-bold">YES</span>
@@ -152,5 +306,13 @@ export default function ProfilePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>}>
+      <ProfileContent />
+    </Suspense>
   );
 }
