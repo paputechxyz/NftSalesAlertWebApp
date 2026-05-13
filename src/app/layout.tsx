@@ -47,6 +47,7 @@ export const metadata: Metadata = {
 import { AuthProvider } from "@/context/AuthContext";
 import { UIProvider } from "@/context/UIContext";
 import Navbar from "@/components/Navbar";
+import BackToTop from "@/components/BackToTop";
 
 export default function RootLayout({
   children,
@@ -63,6 +64,7 @@ export default function RootLayout({
           <UIProvider>
             <Navbar />
             {children}
+            <BackToTop />
           </UIProvider>
         </AuthProvider>
       </body>
