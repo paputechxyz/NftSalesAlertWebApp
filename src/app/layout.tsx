@@ -38,6 +38,10 @@ export const metadata: Metadata = {
     images: ["/og-image.jpg"],
     creator: "@nftsalesalert",
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 import { AuthProvider } from "@/context/AuthContext";
