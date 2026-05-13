@@ -5,13 +5,37 @@ import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useAuth } from '@/context/AuthContext';
 import { getApiUrl } from '@/lib/api';
 import UpgradeModal from '@/components/UpgradeModal';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Search, X } from 'lucide-react';
+import { Suspense } from 'react';
 
-export default function LandingPage() {
+function LandingPageContent() {
   const { user, tier, getToken, refreshWatchlistCount } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const filterParam = searchParams.get('filter') || '';
+  const [searchQuery, setSearchQuery] = useState(filterParam);
   const [collections, setCollections] = useState<NFTCollection[]>([]);
   const [watchedSlugs, setWatchedSlugs] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+
+  // Sync state with URL param
+  useEffect(() => {
+    setSearchQuery(filterParam);
+  }, [filterParam]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    const params = new URLSearchParams(searchParams.toString());
+    if (query) {
+      params.set('filter', query);
+    } else {
+      params.delete('filter');
+    }
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
 
   const limit = tier >= 2 ? 20 : 1;
 
@@ -95,6 +119,11 @@ export default function LandingPage() {
     }
   };
 
+  const filteredCollections = collections.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <main className="min-h-screen p-8 md:p-24 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto">
@@ -124,6 +153,26 @@ export default function LandingPage() {
               * Push notifications are currently available only on the Android app.
             </p>
           </div>
+          <div className="max-w-xl mx-auto mb-16 relative">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <Search size={20} className="text-slate-500" />
+            </div>
+            <input 
+              type="text" 
+              placeholder="Search collections..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => handleSearch('')}
+                className="absolute inset-y-0 right-4 flex items-center text-slate-500 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            )}
+          </div>
         </header>
 
         {loading && collections.length === 0 ? (
@@ -132,9 +181,19 @@ export default function LandingPage() {
               <div key={i} className="glass-card h-96 animate-shimmer"></div>
             ))}
           </div>
+        ) : filteredCollections.length === 0 ? (
+          <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
+            <p className="text-slate-400 text-lg">No collections found matching "{searchQuery}"</p>
+            <button 
+              onClick={() => handleSearch('')}
+              className="mt-4 text-blue-400 font-bold hover:underline"
+            >
+              Clear filter
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {collections.map((collection) => (
+            {filteredCollections.map((collection) => (
               <NFTCard 
                 key={collection.slug} 
                 collection={collection} 
@@ -156,5 +215,17 @@ export default function LandingPage() {
         }
       />
     </main>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    }>
+      <LandingPageContent />
+    </Suspense>
   );
 }
