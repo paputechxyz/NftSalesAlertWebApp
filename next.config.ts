@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'googleusercontent.com',
+        hostname: '**.googleusercontent.com',
       },
     ],
   },

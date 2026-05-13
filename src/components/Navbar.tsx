@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Star, LogOut, User as UserIcon } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, tier } = useAuth();
 
   return (
     <nav className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
@@ -15,26 +16,47 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6">
+          <Link href="/watchlist" className="text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+            <Star size={16} />
+            Watchlist
+          </Link>
+
           {user ? (
-            <>
-              <Link href="/watchlist" className="text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-2">
-                <Star size={16} />
-                Watchlist
-              </Link>
-              <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-slate-400">Logged in as</span>
-                  <span className="text-sm font-medium text-slate-200">{user.displayName || user.email}</span>
+            <div className="flex items-center gap-4 pl-4 border-l border-white/10">
+              <Link href="/profile" className="flex items-center gap-2 group">
+                <div className="relative">
+                  {user.photoURL ? (
+                    <Image 
+                      src={user.photoURL} 
+                      alt="Profile" 
+                      width={32} 
+                      height={32} 
+                      className="rounded-full border border-white/20 group-hover:border-blue-500 transition-colors"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                      <UserIcon size={16} className="text-white" />
+                    </div>
+                  )}
+                  {tier >= 2 && (
+                    <div className="absolute -top-1 -right-1 bg-yellow-500 w-3 h-3 rounded-full border-2 border-[#0a0a0a]"></div>
+                  )}
                 </div>
-                <button 
-                  onClick={logout}
-                  className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-full transition-all"
-                  title="Logout"
-                >
-                  <LogOut size={18} />
-                </button>
-              </div>
-            </>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
+                    {user.displayName?.split(' ')[0] || 'Profile'}
+                  </p>
+                  {tier >= 2 && <p className="text-[10px] text-yellow-500 font-bold uppercase tracking-tighter">PRO</p>}
+                </div>
+              </Link>
+              <button 
+                onClick={logout}
+                className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-full transition-all"
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
           ) : (
             <button 
               onClick={login}

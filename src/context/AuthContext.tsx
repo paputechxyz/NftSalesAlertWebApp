@@ -12,21 +12,62 @@ import { auth, googleProvider } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
+  tier: number;
   loading: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   getToken: () => Promise<string | null>;
+  refreshTier: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [tier, setTier] = useState<number>(1);
   const [loading, setLoading] = useState(true);
 
+  const fetchTier = async (currentUser: User) => {
+    try {
+      const token = await getIdToken(currentUser);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/user/${currentUser.uid}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTier(data.tier || 1);
+      } else if (response.status === 404) {
+        // If user not found, create them
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            fid: currentUser.uid,
+            email: currentUser.email,
+            tier: 1,
+            sign_in_provider: 'google'
+          })
+        });
+        setTier(1);
+      }
+    } catch (error) {
+      console.error("Error fetching user tier", error);
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        await fetchTier(user);
+      } else {
+        setTier(1);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -53,8 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return await getIdToken(user);
   };
 
+  const refreshTier = async () => {
+    if (user) await fetchTier(user);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, getToken }}>
+    <AuthContext.Provider value={{ user, tier, loading, login, logout, getToken, refreshTier }}>
       {children}
     </AuthContext.Provider>
   );
