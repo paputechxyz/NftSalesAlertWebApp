@@ -11,7 +11,7 @@ export default function Navbar() {
   const { viewMode, setViewMode } = useUI();
 
   return (
-    <nav className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+    <nav className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-10 h-10 overflow-hidden rounded-xl">

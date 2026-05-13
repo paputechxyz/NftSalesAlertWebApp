@@ -175,7 +175,7 @@ function LandingPageContent() {
   );
 
   return (
-    <main className="min-h-screen p-8 md:p-24 bg-[#0a0a0a]">
+    <main className="min-h-screen p-8 md:p-24 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <header className="mb-16 text-center">
           <h1 className="text-5xl md:text-7xl font-bold gradient-text mb-4 tracking-tighter">
