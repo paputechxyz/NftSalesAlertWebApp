@@ -8,6 +8,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import { Suspense } from 'react';
+import AuthModal from '@/components/AuthModal';
 
 function LandingPageContent() {
   const { user, tier, getToken, refreshWatchlistCount } = useAuth();
@@ -20,6 +21,7 @@ function LandingPageContent() {
   const [watchedSlugs, setWatchedSlugs] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [manualAddLoading, setManualAddLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -86,7 +88,10 @@ function LandingPageContent() {
   }, [user]);
 
   const toggleWatch = async (slug: string) => {
-    if (!user) return;
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
     
     const isWatched = watchedSlugs.has(slug);
     
@@ -123,7 +128,7 @@ function LandingPageContent() {
 
   const handleManualAdd = async (slug: string) => {
     if (!user) {
-      alert("Please login first");
+      setIsAuthModalOpen(true);
       return;
     }
     
@@ -306,6 +311,11 @@ function LandingPageContent() {
           ? "You've reached the Pro limit of 20 collections. Please remove a collection before adding a new one." 
           : "Free users can only track 1 collection. Download our Android app to upgrade to Pro and track up to 20 collections!"
         }
+      />
+
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </main>
   );
