@@ -151,7 +151,7 @@ function LandingPageContent() {
         router.push('/watchlist');
       } else if (response.status === 404) {
         setErrorMessage(
-          <span>Collection slug <span className="text-blue-400 font-mono font-bold">{slug}</span> not found on OpenSea. Please double check the slug.</span>
+          <span>Slug <span className="text-blue-400 font-mono font-bold">{slug}</span> not found.</span>
         );
       } else if (response.status === 400) {
         const data = await response.json();

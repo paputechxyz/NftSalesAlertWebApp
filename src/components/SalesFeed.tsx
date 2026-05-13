@@ -23,12 +23,20 @@ export default function SalesFeed() {
     }
   }, []);
 
+  const truncateTokenId = (tokenId: string) => {
+    if (!tokenId || tokenId.length <= 32) return tokenId;
+    return `${tokenId.slice(0, 8)}...${tokenId.slice(-8)}`;
+  };
+
   const sendNotification = useCallback((newSales: SaleEvent[]) => {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
     if (newSales.length === 1) {
       const sale = newSales[0];
-      const displayName = sale.name.includes('#') ? sale.name : `${sale.name} #${sale.token_id}`;
+      const displayName = sale.name.includes('#') 
+        ? sale.name.split('#')[0] + '#' + truncateTokenId(sale.name.split('#')[1])
+        : `${sale.name} #${truncateTokenId(sale.token_id)}`;
+        
       new Notification('New NFT Sale!', {
         body: `${displayName} sold for ${sale.formated_price_rounded}`,
         icon: sale.image_url || '/logo.png',

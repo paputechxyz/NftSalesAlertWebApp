@@ -42,6 +42,11 @@ export default function SaleItem({ sale }: SaleItemProps) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  const truncateTokenId = (tokenId: string) => {
+    if (!tokenId || tokenId.length <= 32) return tokenId;
+    return `${tokenId.slice(0, 8)}...${tokenId.slice(-8)}`;
+  };
+
   return (
     <div className="glass-card overflow-hidden group flex flex-col sm:flex-row items-center p-4 gap-6 hover:border-blue-500/30 transition-all">
       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl">
@@ -63,7 +68,10 @@ export default function SaleItem({ sale }: SaleItemProps) {
         <div className="flex justify-between items-start mb-2">
           <div>
             <h3 className="text-lg font-bold text-white truncate">
-              {sale.name.includes('#') ? sale.name : `${sale.name} #${sale.token_id}`}
+              {sale.name.includes('#') 
+                ? sale.name.split('#')[0] + '#' + truncateTokenId(sale.name.split('#')[1])
+                : `${sale.name} #${truncateTokenId(sale.token_id)}`
+              }
             </h3>
             <p className="text-xs text-blue-400 font-medium uppercase tracking-widest truncate">
               {sale.slug.replace(/-/g, ' ')}
