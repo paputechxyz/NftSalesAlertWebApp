@@ -1,27 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-
-interface NFTCollection {
-  slug: string;
-  name: string;
-  image_url: string;
-  volume: number;
-  sales: number;
-  num_owners: number;
-  market_cap: number;
-  floor_price: number;
-  floor_price_symbol: string;
-}
+import NFTCard, { NFTCollection } from '@/components/NFTCard';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LandingPage() {
+  const { user, getToken } = useAuth();
   const [collections, setCollections] = useState<NFTCollection[]>([]);
+  const [watchedSlugs, setWatchedSlugs] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   const fetchCollections = async () => {
     try {
-      // Backend is running on port 8000
       const response = await fetch('http://localhost:8000/api/v1/watchlist/recent');
       if (response.ok) {
         const data = await response.json();
@@ -34,9 +24,63 @@ export default function LandingPage() {
     }
   };
 
+  const fetchWatchlist = async () => {
+    if (!user) return;
+    try {
+      const token = await getToken();
+      const response = await fetch(`http://localhost:8000/api/v1/watchlist/${user.uid}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setWatchedSlugs(new Set(data.map((item: any) => item.slug)));
+      }
+    } catch (error) {
+      console.error('Error fetching watchlist:', error);
+    }
+  };
+
   useEffect(() => {
     fetchCollections();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchWatchlist();
+    } else {
+      setWatchedSlugs(new Set());
+    }
+  }, [user]);
+
+  const toggleWatch = async (slug: string) => {
+    if (!user) return;
+    
+    const isWatched = watchedSlugs.has(slug);
+    const method = isWatched ? 'DELETE' : 'POST';
+    const token = await getToken();
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/watchlist/${user.uid}/${slug}`, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setWatchedSlugs(prev => {
+          const next = new Set(prev);
+          if (isWatched) next.delete(slug);
+          else next.add(slug);
+          return next;
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling watchlist:', error);
+    }
+  };
 
   return (
     <main className="min-h-screen p-8 md:p-24 bg-[#0a0a0a]">
@@ -59,60 +103,16 @@ export default function LandingPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {collections.map((collection) => (
-              <div key={collection.slug} className="glass-card overflow-hidden group">
-                <div className="relative h-48 w-full overflow-hidden">
-                  <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
-                    {collection.image_url ? (
-                      <Image
-                        src={collection.image_url}
-                        alt={collection.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-600">
-                        No Image
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                  </div>
-                  <div className="absolute bottom-4 left-4">
-                    <h3 className="text-xl font-bold text-white">{collection.name}</h3>
-                    <p className="text-xs text-slate-400 uppercase tracking-widest">{collection.slug}</p>
-                  </div>
-                </div>
-
-                <div className="p-6 grid grid-cols-2 gap-4">
-                  <Stat label="Floor Price" value={`${collection.floor_price?.toFixed(3) || '0'} ${collection.floor_price_symbol}`} />
-                  <Stat label="Volume" value={formatCompact(collection.volume)} />
-                  <Stat label="Sales" value={collection.sales?.toString() || '0'} />
-                  <Stat label="Owners" value={formatCompact(collection.num_owners)} />
-                  <div className="col-span-2 border-t border-white/5 pt-4 mt-2">
-                    <Stat label="Market Cap" value={`${formatCompact(collection.market_cap)} ${collection.floor_price_symbol}`} />
-                  </div>
-                </div>
-              </div>
+              <NFTCard 
+                key={collection.slug} 
+                collection={collection} 
+                isWatched={watchedSlugs.has(collection.slug)}
+                onToggleWatch={toggleWatch}
+              />
             ))}
           </div>
         )}
       </div>
     </main>
   );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">{label}</p>
-      <p className="text-lg font-medium text-slate-200">{value}</p>
-    </div>
-  );
-}
-
-function formatCompact(number: number) {
-  if (number === null || number === undefined) return '0';
-  return new Intl.NumberFormat('en-US', {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(number);
 }
