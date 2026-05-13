@@ -172,29 +172,11 @@ function ProfileContent() {
 
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex-1">
-                  {subscriptionDetails && subscriptionDetails.expiryDate ? (
-                    <>
-                      <p className="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">
-                        {subscriptionDetails.cancelAtPeriodEnd ? 'Subscription Cancels On' : 'Next Billing Date'}
-                      </p>
-                      <p className="text-white text-xl font-medium">
-                        {new Date(subscriptionDetails.expiryDate).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
-                      <p className="text-white/40 text-sm mt-1">
-                        {subscriptionDetails.cancelAtPeriodEnd ? 'Your access will continue until this date.' : 'Your subscription will automatically renew.'}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">Status</p>
-                      <p className="text-white text-xl font-medium">Pro Subscription Active</p>
-                      <p className="text-white/40 text-sm mt-1">Manage your billing and renewal below.</p>
-                    </>
-                  )}
+                  <div>
+                    <p className="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">Status</p>
+                    <p className="text-white text-xl font-medium">Pro Subscription Active</p>
+                    <p className="text-white/40 text-sm mt-1">Manage your billing and renewal in the Stripe portal.</p>
+                  </div>
                 </div>
                 
                 {subscriptionDetails?.provider === 'stripe' && (
