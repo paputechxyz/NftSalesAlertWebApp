@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useRouter } from 'next/navigation';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, Star, User as UserIcon } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 import { useUI } from '@/context/UIContext';
 import SalesFeed from '@/components/SalesFeed';
 
 export default function WatchlistPage() {
-  const { user, tier, loading: authLoading, getToken, refreshWatchlistCount } = useAuth();
+  const { user, tier, loading: authLoading, getToken, refreshWatchlistCount, login } = useAuth();
   const [watchlist, setWatchlist] = useState<NFTCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const { viewMode } = useUI();
@@ -61,12 +61,10 @@ export default function WatchlistPage() {
   };
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/');
-    } else if (user) {
+    if (user) {
       fetchWatchlist();
     }
-  }, [user, authLoading, router]);
+  }, [user]);
 
   const toggleWatch = async (slug: string) => {
     if (!user) return;
@@ -111,7 +109,24 @@ export default function WatchlistPage() {
           </div>
         </header>
 
-        {watchlist.length === 0 ? (
+        {!user ? (
+          <div className="glass-card p-16 text-center max-w-2xl mx-auto border-white/20">
+            <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-8 ring-1 ring-blue-500/20">
+              <Star size={48} className="text-blue-400" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-6 tracking-tight">Login to view your watchlist</h2>
+            <p className="text-slate-400 mb-10 text-lg leading-relaxed">
+              Access your personalized NFT watchlist and track sales in real-time across all your favorite collections. Sign in to start monitoring the market.
+            </p>
+            <button 
+              onClick={login}
+              className="px-10 py-5 bg-white text-black font-bold rounded-full hover:bg-slate-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto text-lg shadow-2xl shadow-blue-500/10"
+            >
+              <UserIcon size={24} />
+              Sign in with Google
+            </button>
+          </div>
+        ) : watchlist.length === 0 ? (
           <div className="glass-card p-12 text-center">
             <p className="text-slate-400 mb-6 text-lg">You haven't added any collections to your watchlist yet.</p>
             <button 
