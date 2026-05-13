@@ -46,7 +46,7 @@ export default function LandingPage() {
             NFT Sales Analytics
           </h1>
           <p className="text-slate-400 text-lg mb-8">
-            Real-time insights into the most active NFT collections.
+            Real-time insights into the most active NFT collections
           </p>
         </header>
 
@@ -60,20 +60,22 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {collections.map((collection) => (
               <div key={collection.slug} className="glass-card overflow-hidden group">
-                <div className="relative h-48 w-full">
-                  {collection.image_url ? (
-                    <Image
-                      src={collection.image_url}
-                      alt={collection.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-600">
-                      No Image
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                <div className="relative h-48 w-full overflow-hidden">
+                  <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
+                    {collection.image_url ? (
+                      <Image
+                        src={collection.image_url}
+                        alt={collection.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-600">
+                        No Image
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                  </div>
                   <div className="absolute bottom-4 left-4">
                     <h3 className="text-xl font-bold text-white">{collection.name}</h3>
                     <p className="text-xs text-slate-400 uppercase tracking-widest">{collection.slug}</p>
