@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { getApiUrl } from '@/lib/api';
 
 export default function WatchlistPage() {
   const { user, loading: authLoading, getToken } = useAuth();
@@ -16,7 +17,7 @@ export default function WatchlistPage() {
     if (!user) return;
     try {
       const token = await getToken();
-      const response = await fetch(`http://localhost:8000/api/v1/watchlist/${user.uid}`, {
+      const response = await fetch(getApiUrl(`/api/v1/watchlist/${user.uid}`), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,7 +59,7 @@ export default function WatchlistPage() {
     
     const token = await getToken();
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/watchlist/${user.uid}/${slug}`, {
+      const response = await fetch(getApiUrl(`/api/v1/watchlist/${user.uid}/${slug}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

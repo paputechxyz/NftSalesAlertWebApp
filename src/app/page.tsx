@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import NFTCard, { NFTCollection } from '@/components/NFTCard';
 import { useAuth } from '@/context/AuthContext';
+import { getApiUrl } from '@/lib/api';
 
 export default function LandingPage() {
   const { user, getToken } = useAuth();
@@ -12,7 +13,7 @@ export default function LandingPage() {
 
   const fetchCollections = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/watchlist/recent');
+      const response = await fetch(getApiUrl('/api/v1/watchlist/recent'));
       if (response.ok) {
         const data = await response.json();
         setCollections(data);
@@ -28,7 +29,7 @@ export default function LandingPage() {
     if (!user) return;
     try {
       const token = await getToken();
-      const response = await fetch(`http://localhost:8000/api/v1/watchlist/${user.uid}`, {
+      const response = await fetch(getApiUrl(`/api/v1/watchlist/${user.uid}`), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -62,7 +63,7 @@ export default function LandingPage() {
     const token = await getToken();
 
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/watchlist/${user.uid}/${slug}`, {
+      const response = await fetch(getApiUrl(`/api/v1/watchlist/${user.uid}/${slug}`), {
         method,
         headers: {
           'Authorization': `Bearer ${token}`
