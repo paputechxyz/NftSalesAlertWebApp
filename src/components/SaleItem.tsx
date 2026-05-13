@@ -71,7 +71,7 @@ export default function SaleItem({ sale }: SaleItemProps) {
           </div>
           <div className="text-right">
             <div className="text-xl font-bold text-white">
-              {sale.formated_price_rounded} {sale.payment_token}
+              {sale.formated_price_rounded}
             </div>
             <div className="text-[10px] text-slate-500 flex items-center justify-end gap-1">
               <Clock size={10} />
