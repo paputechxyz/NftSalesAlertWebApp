@@ -19,9 +19,7 @@ function ProfileContent() {
     try {
       setIsManaging(true);
       const token = await user.getIdToken();
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      
-      const response = await fetch(`${API_URL}/api/v1/stripe/create-portal-session`, {
+      const response = await fetch(`/api/v1/stripe/create-portal-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,9 +52,7 @@ function ProfileContent() {
     try {
       setIsCheckingOut(true);
       const token = await user.getIdToken();
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      
-      const response = await fetch(`${API_URL}/api/v1/stripe/create-checkout-session`, {
+      const response = await fetch(`/api/v1/stripe/create-checkout-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

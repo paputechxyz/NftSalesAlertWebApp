@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchWatchlistCount = async (currentUser: User) => {
     try {
       const token = await getIdToken(currentUser);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/watchlist/${currentUser.uid}`, {
+      const response = await fetch(`/api/v1/watchlist/${currentUser.uid}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = await getIdToken(currentUser);
       // Fetch both tier and watchlist count
       fetchWatchlistCount(currentUser);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/user/${currentUser.uid}`, {
+      const response = await fetch(`/api/v1/user/${currentUser.uid}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       } else if (response.status === 404) {
         // If user not found, create them
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/user`, {
+        await fetch(`/api/v1/user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
