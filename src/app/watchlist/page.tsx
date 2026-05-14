@@ -104,7 +104,7 @@ export default function WatchlistPage() {
               Your Watchlist
             </h1>
             <p className="text-slate-400">
-              Keep track of your favorite collections and their latest performance.
+              Keep track of your favorite collections and their recent sales.
             </p>
           </div>
         </header>

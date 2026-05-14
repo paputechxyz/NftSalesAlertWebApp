@@ -202,7 +202,7 @@ function LandingPageContent() {
               <span>Download on Google Play</span>
             </a>
             <p className="text-slate-500 text-sm">
-              * Push notifications are currently available only on the Android app.
+              * Push notifications are now supported on both web browsers and the Android app.
             </p>
           </div>
           <div className="max-w-xl mx-auto mb-16 relative">
@@ -226,7 +226,7 @@ function LandingPageContent() {
             )}
           </div>
 
-          {searchQuery && filteredCollections.length === 0 && !loading && (
+          {searchQuery && (
             <div className="max-w-xl mx-auto -mt-8 mb-16 animate-in fade-in slide-in-from-top-4">
               <button 
                 onClick={() => handleManualAdd(searchQuery)}
