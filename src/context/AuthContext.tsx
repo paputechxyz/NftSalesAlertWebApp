@@ -93,11 +93,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateLastLogin = async (currentUser: User) => {
+    try {
+      const token = await getIdToken(currentUser);
+      await fetch(`/api/v1/user/${currentUser.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          logged_in: true
+        })
+      });
+    } catch (error) {
+      console.error("Error updating last login", error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
         await fetchTier(user);
+        await updateLastLogin(user);
       } else {
         setTier(1);
       }
