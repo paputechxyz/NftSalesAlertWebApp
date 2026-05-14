@@ -58,9 +58,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         icon: sale.image_url || '/logo.png',
       });
     } else if (sales.length > 1) {
+      const displayCount = sales.length === 10 ? '9+' : sales.length;
       console.log(`[Notification] Sending multiple sales notification: ${sales.length} sales`);
       new Notification('Multiple New Sales!', {
-        body: `${sales.length} new NFT sales detected in your watchlist`,
+        body: `${displayCount} new NFT sales detected in your watchlist`,
         icon: '/logo.png',
       });
     }
