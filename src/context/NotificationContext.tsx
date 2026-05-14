@@ -40,7 +40,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   };
 
   const sendNotification = useCallback((sales: SaleEvent[]) => {
-    if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') return;
+    console.log(`[Notification] Attempting to send notification for ${sales.length} sales. Permission: ${Notification.permission}`);
+    if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
+      console.warn('[Notification] Cannot send notification: permission not granted or window undefined');
+      return;
+    }
 
     if (sales.length === 1) {
       const sale = sales[0];
@@ -48,11 +52,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         ? sale.name.split('#')[0] + '#' + truncateTokenId(sale.name.split('#')[1])
         : `${sale.name} #${truncateTokenId(sale.token_id)}`;
         
+      console.log(`[Notification] Sending single sale notification: ${displayName}`);
       new Notification('New NFT Sale!', {
         body: `${displayName} sold for ${sale.formated_price_rounded}`,
         icon: sale.image_url || '/logo.png',
       });
     } else if (sales.length > 1) {
+      console.log(`[Notification] Sending multiple sales notification: ${sales.length} sales`);
       new Notification('Multiple New Sales!', {
         body: `${sales.length} new NFT sales detected in your watchlist`,
         icon: '/logo.png',
@@ -66,6 +72,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     try {
       const token = await getToken();
       // We only need the latest few sales to check for new ones
+      console.log('[Notification] Polling for latest sales...');
       const response = await fetch(getApiUrl(`/api/v1/sales/${user.uid}?offset=0&page_size=10`), {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -74,13 +81,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       
       if (response.ok) {
         const data: SaleEvent[] = await response.json();
+        console.log(`[Notification] Fetched ${data.length} sales from server.`);
         
         if (data.length > 0) {
           if (isInitialFetchRef.current) {
+            console.log(`[Notification] Initial fetch complete. Latest sale date set to: ${new Date(data[0].date * 1000).toLocaleString()}`);
             latestSaleDateRef.current = data[0].date;
             isInitialFetchRef.current = false;
           } else {
             const freshSales = data.filter(sale => sale.date > latestSaleDateRef.current);
+            console.log(`[Notification] Check for new sales: Found ${freshSales.length} new sales since ${new Date(latestSaleDateRef.current * 1000).toLocaleString()}`);
             if (freshSales.length > 0) {
               setNewSales(prev => [...freshSales, ...prev]);
               latestSaleDateRef.current = freshSales[0].date;
@@ -88,6 +98,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             }
           }
         }
+      } else {
+        console.error(`[Notification] Polling failed with status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error fetching latest sales for notifications:', error);
