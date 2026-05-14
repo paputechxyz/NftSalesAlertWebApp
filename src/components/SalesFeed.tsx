@@ -47,7 +47,7 @@ export default function SalesFeed() {
           setSales(prev => [...prev, ...data]);
         }
         
-        if (data.length < pageSize) {
+        if (data.length === 0) {
           setHasMore(false);
         }
       }
