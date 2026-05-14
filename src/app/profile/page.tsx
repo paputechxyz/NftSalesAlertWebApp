@@ -16,6 +16,15 @@ function ProfileContent() {
 
   const handleManageSubscription = async () => {
     if (!user) return;
+    
+    // Default to google_play if provider is null
+    const provider = subscriptionDetails?.provider || 'google_play';
+    
+    if (provider === 'google_play') {
+      window.open('https://play.google.com/store/account/subscriptions', '_blank');
+      return;
+    }
+
     try {
       setIsManaging(true);
       const token = await user.getIdToken();
@@ -171,20 +180,22 @@ function ProfileContent() {
                   <div>
                     <p className="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">Status</p>
                     <p className="text-white text-xl font-medium">Pro Subscription Active</p>
-                    <p className="text-white/40 text-sm mt-1">Manage your billing and renewal in the Stripe portal.</p>
+                    <p className="text-white/40 text-sm mt-1">
+                      {(subscriptionDetails?.provider === 'stripe') 
+                        ? 'Manage your billing and renewal in the Stripe portal.' 
+                        : 'Manage your subscription through the Google Play Store.'}
+                    </p>
                   </div>
                 </div>
                 
-                {subscriptionDetails?.provider === 'stripe' && (
-                  <button 
-                    onClick={handleManageSubscription}
-                    disabled={isManaging}
+                <button 
+                  onClick={handleManageSubscription}
+                  disabled={isManaging}
                     className="px-6 py-3 bg-white text-amber-700 hover:bg-amber-50 disabled:opacity-50 font-bold rounded-xl transition-all shadow-lg flex items-center gap-2 whitespace-nowrap"
                   >
                     <CreditCard size={18} />
                     {isManaging ? 'Loading...' : 'Manage Subscription'}
                   </button>
-                )}
               </div>
             </div>
           </div>
