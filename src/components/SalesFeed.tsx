@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useNotifications } from '@/context/NotificationContext';
 import { getApiUrl } from '@/lib/api';
 import SaleItem, { SaleEvent } from './SaleItem';
 import { Loader2, Zap } from 'lucide-react';
 
 export default function SalesFeed() {
   const { user, getToken } = useAuth();
+  const { requestPermission, newSales, clearNewSales } = useNotifications();
   const [sales, setSales] = useState<SaleEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -17,43 +19,13 @@ export default function SalesFeed() {
   const latestSaleDateRef = useRef<number>(0);
   const pageSize = 50;
 
-  const requestNotificationPermission = useCallback(async () => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      await Notification.requestPermission();
-    }
-  }, []);
 
-  const truncateTokenId = (tokenId: string) => {
-    if (!tokenId || tokenId.length <= 32) return tokenId;
-    return `${tokenId.slice(0, 8)}...${tokenId.slice(-8)}`;
-  };
 
-  const sendNotification = useCallback((newSales: SaleEvent[]) => {
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
-    if (newSales.length === 1) {
-      const sale = newSales[0];
-      const displayName = sale.name.includes('#') 
-        ? sale.name.split('#')[0] + '#' + truncateTokenId(sale.name.split('#')[1])
-        : `${sale.name} #${truncateTokenId(sale.token_id)}`;
-        
-      new Notification('New NFT Sale!', {
-        body: `${displayName} sold for ${sale.formated_price_rounded}`,
-        icon: sale.image_url || '/logo.png',
-      });
-    } else if (newSales.length > 1) {
-      new Notification('Multiple New Sales!', {
-        body: `${newSales.length} new NFT sales detected in your watchlist`,
-        icon: '/logo.png',
-      });
-    }
-  }, []);
-
-  const fetchSales = useCallback(async (currentOffset: number, isInitial: boolean = false, isPolling: boolean = false) => {
+  const fetchSales = useCallback(async (currentOffset: number, isInitial: boolean = false) => {
     if (!user) return;
     
     if (isInitial) setLoading(true);
-    else if (!isPolling) setLoadingMore(true);
+    else setLoadingMore(true);
 
     try {
       const token = await getToken();
@@ -71,19 +43,11 @@ export default function SalesFeed() {
           if (data.length > 0) {
             latestSaleDateRef.current = data[0].date;
           }
-        } else if (isPolling) {
-          // Check for new sales
-          const newSales = data.filter(sale => sale.date > latestSaleDateRef.current);
-          if (newSales.length > 0) {
-            setSales(prev => [...newSales, ...prev]);
-            latestSaleDateRef.current = newSales[0].date;
-            sendNotification(newSales);
-          }
         } else {
           setSales(prev => [...prev, ...data]);
         }
         
-        if (data.length < pageSize && !isPolling) {
+        if (data.length < pageSize) {
           setHasMore(false);
         }
       }
@@ -93,21 +57,34 @@ export default function SalesFeed() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [user, getToken, sendNotification]);
+  }, [user, getToken]);
 
   useEffect(() => {
     if (user) {
       fetchSales(0, true);
-      requestNotificationPermission();
-
-      // Poll every minute
-      const interval = setInterval(() => {
-        fetchSales(0, false, true);
-      }, 60000);
-
-      return () => clearInterval(interval);
+      requestPermission();
     }
-  }, [user, fetchSales, requestNotificationPermission]);
+  }, [user, fetchSales, requestPermission]);
+
+  // Sync with global notifications
+  useEffect(() => {
+    if (newSales.length > 0) {
+      setSales(prev => {
+        // Filter out any sales that are already in the list (by txn_hash)
+        const currentHashes = new Set(prev.map(s => s.txn_hash));
+        const filteredNewSales = newSales.filter(s => !currentHashes.has(s.txn_hash));
+        
+        if (filteredNewSales.length === 0) return prev;
+        
+        const updatedSales = [...filteredNewSales, ...prev];
+        if (updatedSales.length > 0) {
+          latestSaleDateRef.current = updatedSales[0].date;
+        }
+        return updatedSales;
+      });
+      clearNewSales();
+    }
+  }, [newSales, clearNewSales]);
 
   const lastSaleElementRef = useCallback((node: HTMLDivElement) => {
     if (loading || loadingMore) return;

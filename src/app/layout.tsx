@@ -46,6 +46,7 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/context/AuthContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 import { UIProvider } from "@/context/UIContext";
 import Navbar from "@/components/Navbar";
 import BackToTop from "@/components/BackToTop";
@@ -63,14 +64,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <UIProvider>
-            <Navbar />
-            <div className="flex-grow">
-              {children}
-            </div>
-            <BackToTop />
-            <Footer />
-          </UIProvider>
+          <NotificationProvider>
+            <UIProvider>
+              <Navbar />
+              <div className="flex-grow">
+                {children}
+              </div>
+              <BackToTop />
+              <Footer />
+            </UIProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

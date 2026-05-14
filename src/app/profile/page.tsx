@@ -266,7 +266,7 @@ function ProfileContent() {
             </div>
             <div className="flex justify-between items-center py-3 border-t border-white/5">
               <span className="text-slate-300">Push Notifications</span>
-              <span className="text-blue-400 text-sm font-bold">MOBILE ONLY</span>
+              <span className="text-blue-400 text-sm font-bold">MOBILE & BROWSER</span>
             </div>
           </div>
           
