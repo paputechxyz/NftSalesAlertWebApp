@@ -25,6 +25,7 @@ function LandingPageContent() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [manualAddLoading, setManualAddLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<React.ReactNode | string | null>(null);
+  const [selectedCollection, setSelectedCollection] = useState<NFTCollection | null>(null);
   const { viewMode } = useUI();
 
   // Sync state with URL param
@@ -308,11 +309,45 @@ function LandingPageContent() {
                 isWatched={watchedSlugs.has(collection.slug)}
                 onToggleWatch={toggleWatch}
                 viewMode={viewMode}
+                onClick={(col) => setSelectedCollection(col)}
               />
             ))}
           </div>
         )}
       </div>
+
+      {/* Collection Detail Modal */}
+      {selectedCollection && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setSelectedCollection(null)}
+        >
+          <div 
+            className="w-full max-w-md animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              <button 
+                onClick={() => setSelectedCollection(null)}
+                className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"
+                title="Close"
+              >
+                <X size={20} />
+              </button>
+              <NFTCard 
+                collection={selectedCollection}
+                isWatched={watchedSlugs.has(selectedCollection.slug)}
+                onToggleWatch={(slug) => {
+                  toggleWatch(slug);
+                  // Don't close modal, just update watched status
+                }}
+                viewMode="grid"
+                showOpenSeaLink={true}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Modal */}
       {errorMessage && (

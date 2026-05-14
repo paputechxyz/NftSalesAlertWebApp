@@ -197,6 +197,7 @@ export default function WatchlistPage() {
                   setSelectedCollection(null);
                 }}
                 viewMode="grid"
+                showOpenSeaLink={true}
               />
             </div>
           </div>

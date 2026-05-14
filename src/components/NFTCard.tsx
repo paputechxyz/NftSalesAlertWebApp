@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Star } from 'lucide-react';
+import { Star, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export interface NFTCollection {
@@ -22,9 +22,10 @@ interface NFTCardProps {
   onToggleWatch: (slug: string) => void;
   viewMode?: 'grid' | 'list';
   onClick?: (collection: NFTCollection) => void;
+  showOpenSeaLink?: boolean;
 }
 
-export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode = 'grid', onClick }: NFTCardProps) {
+export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode = 'grid', onClick, showOpenSeaLink = false }: NFTCardProps) {
   const { user } = useAuth();
 
   const handleContainerClick = () => {
@@ -73,6 +74,19 @@ export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode
             >
               <Star size={18} fill={isWatched ? "currentColor" : "none"} />
             </button>
+          )}
+          
+          {showOpenSeaLink && (
+            <a 
+              href={`https://opensea.io/collection/${collection.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-full border border-blue-500/20 transition-all"
+              title="Open on OpenSea"
+            >
+              <ExternalLink size={18} />
+            </a>
           )}
         </div>
       </div>
@@ -132,6 +146,21 @@ export default function NFTCard({ collection, isWatched, onToggleWatch, viewMode
         <div className="col-span-2 border-t border-white/5 pt-4 mt-2">
           <Stat label="Market Cap" value={`${formatCompact(collection.market_cap)} ${collection.floor_price_symbol}`} />
         </div>
+        
+        {showOpenSeaLink && (
+          <div className="col-span-2 mt-4">
+            <a 
+              href={`https://opensea.io/collection/${collection.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold rounded-xl border border-blue-500/20 transition-all hover:scale-[1.02] active:scale-95"
+            >
+              <ExternalLink size={18} />
+              Open on OpenSea
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
