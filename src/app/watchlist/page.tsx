@@ -10,7 +10,7 @@ import { useUI } from '@/context/UIContext';
 import SalesFeed from '@/components/SalesFeed';
 
 export default function WatchlistPage() {
-  const { user, tier, loading: authLoading, getToken, refreshWatchlistCount, login } = useAuth();
+  const { user, tier, loading: authLoading, getToken, refreshWatchlistCount, login, loginAnonymously } = useAuth();
   const [watchlist, setWatchlist] = useState<NFTCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const { viewMode } = useUI();
@@ -124,6 +124,20 @@ export default function WatchlistPage() {
             >
               <UserIcon size={24} />
               Sign in with Google
+            </button>
+
+            <div className="relative flex py-6 items-center max-w-sm mx-auto">
+              <div className="flex-grow border-t border-white/10"></div>
+              <span className="flex-shrink-0 mx-4 text-slate-500 text-sm font-medium uppercase tracking-widest">or</span>
+              <div className="flex-grow border-t border-white/10"></div>
+            </div>
+
+            <button 
+              onClick={loginAnonymously}
+              className="px-8 py-4 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto border border-white/10 shadow-lg"
+            >
+              <UserIcon size={20} />
+              Continue as Guest
             </button>
           </div>
         ) : watchlist.length === 0 ? (

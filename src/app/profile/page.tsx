@@ -3,11 +3,11 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
-import { User, Shield, Star, Rocket, Download, ExternalLink, CreditCard } from 'lucide-react';
+import { User, Shield, Star, Rocket, Download, ExternalLink, CreditCard, LogIn } from 'lucide-react';
 import Image from 'next/image';
 
 function ProfileContent() {
-  const { user, tier, loading, refreshTier, subscriptionDetails } = useAuth();
+  const { user, tier, loading, refreshTier, subscriptionDetails, login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const checkoutStatus = searchParams.get('checkout');
@@ -125,7 +125,7 @@ function ProfileContent() {
       <div className="max-w-4xl mx-auto">
         <header className="mb-12 flex flex-col md:flex-row items-center gap-8 bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
           <div className="relative">
-            {user.photoURL ? (
+            {!user.isAnonymous && user.photoURL ? (
               <Image 
                 src={user.photoURL} 
                 alt={user.displayName || 'Profile'} 
@@ -146,8 +146,8 @@ function ProfileContent() {
           </div>
           
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{user.displayName || 'Anonymous User'}</h1>
-            <p className="text-slate-400 mb-4">{user.email}</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{user.isAnonymous ? 'Guest User' : (user.displayName || 'Anonymous User')}</h1>
+            <p className="text-slate-400 mb-4">{user.email || 'Guest Account'}</p>
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <span className={`px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${
                 isPro ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
@@ -221,25 +221,35 @@ function ProfileContent() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  {user.isAnonymous ? (
                     <button 
-                      onClick={() => handleStripeCheckout('monthly')}
-                      disabled={isCheckingOut}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#635BFF] hover:bg-[#4B44CC] disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-lg"
+                      onClick={login}
+                      className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-white text-black font-bold rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99] mb-4 shadow-lg"
                     >
-                      <CreditCard size={18} />
-                      {isCheckingOut ? 'Loading...' : 'Subscribe Monthly ($4.99)'}
+                      <LogIn size={20} />
+                      Sign in with Google to upgrade
                     </button>
-                    <button 
-                      onClick={() => handleStripeCheckout('yearly')}
-                      disabled={isCheckingOut}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#0a2540] hover:bg-[#07192a] disabled:opacity-50 border border-[#635BFF]/30 text-white font-bold rounded-xl transition-all shadow-lg relative overflow-hidden"
-                    >
-                      <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Save 16%</div>
-                      <CreditCard size={18} />
-                      {isCheckingOut ? 'Loading...' : 'Subscribe Yearly ($49.99)'}
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <button 
+                        onClick={() => handleStripeCheckout('monthly')}
+                        disabled={isCheckingOut}
+                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#635BFF] hover:bg-[#4B44CC] disabled:opacity-50 text-white font-bold rounded-xl transition-all shadow-lg"
+                      >
+                        <CreditCard size={18} />
+                        {isCheckingOut ? 'Loading...' : 'Subscribe Monthly ($4.99)'}
+                      </button>
+                      <button 
+                        onClick={() => handleStripeCheckout('yearly')}
+                        disabled={isCheckingOut}
+                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#0a2540] hover:bg-[#07192a] disabled:opacity-50 border border-[#635BFF]/30 text-white font-bold rounded-xl transition-all shadow-lg relative overflow-hidden"
+                      >
+                        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Save 16%</div>
+                        <CreditCard size={18} />
+                        {isCheckingOut ? 'Loading...' : 'Subscribe Yearly ($49.99)'}
+                      </button>
+                    </div>
+                  )}
                   
                   <div className="relative flex py-2 items-center">
                     <div className="flex-grow border-t border-white/10"></div>
@@ -254,7 +264,7 @@ function ProfileContent() {
                     className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0077cc] hover:bg-[#005fa3] text-white font-bold rounded-xl transition-all"
                   >
                     <Download size={18} />
-                    Download from Google Play to Upgrade
+                    Download from Google Play to upgrade
                   </a>
                 </div>
               </div>
@@ -273,11 +283,15 @@ function ProfileContent() {
             <p className="text-slate-400 text-sm mb-4">Manage your subscription in the Google Play or Stripe.</p>
             <div className="flex justify-between items-center py-3 border-t border-white/5">
               <span className="text-slate-300">Email Verified</span>
-              <span className="text-green-500 text-sm font-bold">YES</span>
+              <span className={`${user.isAnonymous ? 'text-red-500' : 'text-green-500'} text-sm font-bold uppercase`}>
+                {user.isAnonymous ? 'no' : 'yes'}
+              </span>
             </div>
             <div className="flex justify-between items-center py-3 border-t border-white/5">
               <span className="text-slate-300">Push Notifications</span>
-              <span className="text-blue-400 text-sm font-bold">MOBILE & BROWSER</span>
+              <span className="text-blue-400 text-sm font-bold uppercase">
+                {user.isAnonymous ? 'browser' : 'mobile & browser'}
+              </span>
             </div>
           </div>
           

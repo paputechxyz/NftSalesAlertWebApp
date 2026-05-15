@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useUI } from '@/context/UIContext';
 import { usePathname } from 'next/navigation';
 import { Star, LogOut, User as UserIcon, LayoutGrid, List, Menu, X as CloseIcon } from 'lucide-react';
+import AuthModal from '@/components/AuthModal';
 
 export default function Navbar() {
   const { user, login, logout, tier, watchlistCount } = useAuth();
@@ -14,9 +15,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const isWatchlistPage = pathname === '/watchlist';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
-    <nav className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+    <>
+      <nav className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-9 h-9 overflow-hidden rounded-xl">
@@ -71,7 +74,7 @@ export default function Navbar() {
             <div className="flex items-center gap-4 pl-4 border-l border-white/10">
               <Link href="/profile" className="flex items-center gap-2 group">
                 <div className="relative">
-                  {user.photoURL ? (
+                  {!user.isAnonymous && user.photoURL ? (
                     <Image 
                       src={user.photoURL} 
                       alt="Profile" 
@@ -90,7 +93,7 @@ export default function Navbar() {
                 </div>
                 <div className="hidden sm:block">
                   <p className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
-                    {user.displayName?.split(' ')[0] || 'Profile'}
+                    {user.isAnonymous ? 'Guest' : (user.displayName?.split(' ')[0] || 'Profile')}
                   </p>
                   {tier > 1 && <p className="text-[10px] text-yellow-500 font-bold uppercase tracking-tighter">PRO</p>}
                 </div>
@@ -105,7 +108,7 @@ export default function Navbar() {
             </div>
           ) : (
             <button 
-              onClick={login}
+              onClick={() => setIsAuthModalOpen(true)}
               className="px-4 py-2 bg-white text-black text-sm font-semibold rounded-full hover:bg-slate-200 transition-all flex items-center gap-2"
             >
               <UserIcon size={16} />
@@ -176,12 +179,12 @@ export default function Navbar() {
                   className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10 text-slate-300 active:bg-blue-500 active:text-white transition-all"
                 >
                   <UserIcon size={24} />
-                  <span className="text-sm font-bold">Profile</span>
+                  <span className="text-sm font-bold">{user.isAnonymous ? 'Guest' : 'Profile'}</span>
                 </Link>
               ) : (
                 <button 
                   onClick={() => {
-                    login();
+                    setIsAuthModalOpen(true);
                     setIsMenuOpen(false);
                   }}
                   className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10 text-slate-300 active:bg-blue-500 active:text-white transition-all"
@@ -207,6 +210,9 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    </nav>
+
+      </nav>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+    </>
   );
 }

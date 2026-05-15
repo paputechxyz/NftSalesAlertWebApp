@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { 
   onAuthStateChanged, 
   signInWithPopup, 
+  signInAnonymously,
   signOut, 
   User,
   getIdToken
@@ -15,6 +16,7 @@ interface AuthContextType {
   tier: number;
   loading: boolean;
   login: () => Promise<void>;
+  loginAnonymously: () => Promise<void>;
   logout: () => Promise<void>;
   getToken: () => Promise<string | null>;
   refreshTier: () => Promise<void>;
@@ -35,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [watchlistCount, setWatchlistCount] = useState<number>(0);
   const [subscriptionDetails, setSubscriptionDetails] = useState<AuthContextType['subscriptionDetails']>(null);
   const [loading, setLoading] = useState(true);
+  const [isGuestHidden, setIsGuestHidden] = useState(false);
 
   const fetchWatchlistCount = async (currentUser: User) => {
     try {
@@ -81,9 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
           body: JSON.stringify({
             fid: currentUser.uid,
-            email: currentUser.email,
+            email: currentUser.email || null,
             tier: 1,
-            sign_in_provider: 'google'
+            sign_in_provider: currentUser.isAnonymous ? 'anonymous' : 'google'
           })
         });
         setTier(1);
@@ -113,6 +116,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.isAnonymous) {
+        const hidden = localStorage.getItem('guest_hidden') === 'true';
+        setIsGuestHidden(hidden);
+      } else {
+        setIsGuestHidden(false);
+        if (!user) {
+          localStorage.removeItem('guest_hidden');
+        }
+      }
+
       setUser(user);
       if (user) {
         await fetchTier(user);
@@ -127,15 +140,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async () => {
     try {
+      localStorage.removeItem('guest_hidden');
+      setIsGuestHidden(false);
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Login failed", error);
     }
   };
 
+  const loginAnonymously = async () => {
+    try {
+      if (user?.isAnonymous) {
+        localStorage.removeItem('guest_hidden');
+        setIsGuestHidden(false);
+      } else {
+        await signInAnonymously(auth);
+      }
+    } catch (error) {
+      console.error("Anonymous login failed", error);
+    }
+  };
+
   const logout = async () => {
     try {
-      await signOut(auth);
+      if (user?.isAnonymous) {
+        localStorage.setItem('guest_hidden', 'true');
+        setIsGuestHidden(true);
+      } else {
+        await signOut(auth);
+      }
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -152,14 +185,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ 
-      user, 
+      user: isGuestHidden ? null : user, 
       tier, 
       loading, 
       login, 
+      loginAnonymously,
       logout, 
       getToken, 
       refreshTier,
-      watchlistCount,
+      watchlistCount: isGuestHidden ? 0 : watchlistCount,
       refreshWatchlistCount: async () => { if (user) await fetchWatchlistCount(user); },
       subscriptionDetails
     }}>

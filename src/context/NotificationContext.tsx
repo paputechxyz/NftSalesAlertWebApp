@@ -15,7 +15,7 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const { user, getToken } = useAuth();
+  const { user, getToken, loading } = useAuth();
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [newSales, setNewSales] = useState<SaleEvent[]>([]);
   const latestSaleDateRef = useRef<number>(0);
@@ -100,7 +100,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           }
         }
       } else {
-        console.error(`[Notification] Polling failed with status: ${response.status}`);
+        // 404 is expected for new users or empty watchlists, no need to log as error
+        if (response.status !== 404) {
+          console.error(`[Notification] Polling failed with status: ${response.status}`);
+        }
       }
     } catch (error) {
       console.error('Error fetching latest sales for notifications:', error);
@@ -108,7 +111,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [user, getToken, sendNotification]);
 
   useEffect(() => {
-    if (user) {
+    if (user && !loading) {
       // Initial fetch to set the latest sale date
       fetchLatestSales();
 
@@ -123,7 +126,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       latestSaleDateRef.current = 0;
       setNewSales([]);
     }
-  }, [user, fetchLatestSales]);
+  }, [user, loading, fetchLatestSales]);
 
   const clearNewSales = () => setNewSales([]);
 
