@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +68,9 @@ export default function RootLayout({
         <AuthProvider>
           <NotificationProvider>
             <UIProvider>
+              <Suspense fallback={null}>
+                <GoogleAnalytics />
+              </Suspense>
               <Navbar />
               <div className="flex-grow">
                 {children}

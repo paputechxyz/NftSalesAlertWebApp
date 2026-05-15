@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { User, Shield, Star, Rocket, Download, ExternalLink, CreditCard, LogIn } from 'lucide-react';
 import Image from 'next/image';
+import * as analytics from '@/lib/analytics';
 
 function ProfileContent() {
   const { user, tier, loading, refreshTier, subscriptionDetails, login } = useAuth();
@@ -46,6 +47,11 @@ function ProfileContent() {
 
       const data = await response.json();
       if (data.portal_url) {
+        analytics.event({
+          action: 'manage_subscription',
+          category: 'Subscription',
+          label: provider
+        });
         window.open(data.portal_url, '_blank');
       }
     } catch (error) {
@@ -82,6 +88,11 @@ function ProfileContent() {
 
       const data = await response.json();
       if (data.checkout_url) {
+        analytics.event({
+          action: 'begin_checkout',
+          category: 'Subscription',
+          label: plan
+        });
         window.location.href = data.checkout_url;
       }
     } catch (error) {

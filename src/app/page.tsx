@@ -10,6 +10,7 @@ import { Search, X, AlertCircle } from 'lucide-react';
 import { Suspense } from 'react';
 import AuthModal from '@/components/AuthModal';
 import { useUI } from '@/context/UIContext';
+import * as analytics from '@/lib/analytics';
 
 function LandingPageContent() {
   const { user, tier, getToken, refreshWatchlistCount } = useAuth();
@@ -123,6 +124,11 @@ function LandingPageContent() {
           return next;
         });
         refreshWatchlistCount();
+        analytics.event({
+          action: isWatched ? 'remove_from_watchlist' : 'add_to_watchlist',
+          category: 'Watchlist',
+          label: slug
+        });
       }
     } catch (error) {
       console.error('Error toggling watchlist:', error);
@@ -149,6 +155,11 @@ function LandingPageContent() {
 
       if (response.ok) {
         refreshWatchlistCount();
+        analytics.event({
+          action: 'add_to_watchlist_manual',
+          category: 'Watchlist',
+          label: slug
+        });
         router.push('/watchlist');
       } else if (response.status === 404) {
         setErrorMessage(
@@ -195,6 +206,7 @@ function LandingPageContent() {
               href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => analytics.event({ action: 'click', category: 'Download', label: 'Google Play Store' })}
               className="inline-flex items-center gap-3 px-8 py-4 bg-[#0077cc] hover:bg-[#005fa3] text-white font-bold rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(0,119,204,0.4)]"
             >
               <svg viewBox="30 336.7 512 512" width="24" height="24" fill="currentColor">

@@ -10,6 +10,7 @@ import {
   getIdToken
 } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
+import * as analytics from '@/lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -143,6 +144,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem('guest_hidden');
       setIsGuestHidden(false);
       await signInWithPopup(auth, googleProvider);
+      analytics.event({
+        action: 'login',
+        category: 'Auth',
+        label: 'Google'
+      });
     } catch (error) {
       console.error("Login failed", error);
     }
@@ -156,6 +162,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         await signInAnonymously(auth);
       }
+      analytics.event({
+        action: 'login',
+        category: 'Auth',
+        label: 'Anonymous'
+      });
     } catch (error) {
       console.error("Anonymous login failed", error);
     }
@@ -169,6 +180,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         await signOut(auth);
       }
+      analytics.event({
+        action: 'logout',
+        category: 'Auth'
+      });
     } catch (error) {
       console.error("Logout failed", error);
     }
