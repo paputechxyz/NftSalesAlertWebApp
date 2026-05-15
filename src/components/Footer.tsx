@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mail, ShieldCheck, ExternalLink } from 'lucide-react';
+import { Mail, ShieldCheck, ExternalLink, HelpCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -41,6 +41,12 @@ export default function Footer() {
                 </a>
               </li>
               <li>
+                <a href="https://nftsalesalert.com/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                  <HelpCircle size={14} />
+                  Tutorials & Help
+                </a>
+              </li>
+              <li>
                 <a href="https://nftsalesalert.com/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <ShieldCheck size={14} />
                   Privacy Policy
@@ -51,7 +57,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs">
-          <p>© 2025 NFT Sales Alert - OpenSea Notifications Android App. All rights reserved.</p>
+          <p>© 2026 NFT Sales Alert - OpenSea Notifications Android App. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a href="https://nftsalesalert.com/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
             <a href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales" target="_blank" rel="noopener noreferrer" className="hover:text-slate-300 transition-colors">
