@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     default: 'NFT Sales Alert - Free Real-Time OpenSea Notifications',
     template: '%s | NFT Sales Alert'
   },
-  description: 'Get instant NFT sales alerts and notifications from OpenSea. Track floor prices, sales activity, and NFT collections in real-time with no wallet connection required.',
+  description: 'Get instant NFT sales alerts and notifications from OpenSea. Track sales activity and NFT collections in real-time with no wallet connection required.',
   keywords: ['NFT sales alert', 'OpenSea notifications', 'NFT floor price tracker', 'Real-time NFT alerts', 'NFT price alerts', 'OpenSea sales bot', 'NFT watchlist'],
   authors: [{ name: 'NFT Sales Alert' }],
   creator: 'NFT Sales Alert',
   publisher: 'NFT Sales Alert',
   openGraph: {
     title: "NFT Sales Alert - Real-Time OpenSea Notifications",
-    description: "Never miss a flip. Get instant push notifications for NFT sales and floor price changes on OpenSea.",
+    description: "Never miss a flip. Get instant push notifications for NFT sales on OpenSea.",
     url: "https://app.nftsalesalert.com",
     siteName: "NFT Sales Alert",
     images: [
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NFT Sales Alert - Real-Time OpenSea Notifications",
-    description: "Never miss a flip. Get instant push notifications for NFT sales and floor price changes on OpenSea.",
+    description: "Never miss a flip. Get instant push notifications for NFT sales on OpenSea.",
     images: ["/og-image.jpg"],
     creator: "@nftsalesalert",
   },

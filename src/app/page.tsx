@@ -196,7 +196,7 @@ function LandingPageContent() {
             NFT Sales Alert
           </h1>
           <p className="text-slate-400 text-lg">
-            Get instant push notifications for NFT sales and floor price changes on OpenSea.
+            Get instant push notifications for NFT sales on OpenSea.
           </p>
           <p className="text-blue-400/80 text-md mb-8 font-medium italic">
             Watch your favourite NFT collection for free, forever.
