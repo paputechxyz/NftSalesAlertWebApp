@@ -14,6 +14,7 @@ export default function Navbar() {
   const { viewMode, setViewMode } = useUI();
   const pathname = usePathname();
   const isWatchlistPage = pathname === '/watchlist';
+  const isHomePage = pathname === '/';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -38,7 +39,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
-          {!isWatchlistPage && (
+          {isHomePage && (
             <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => setViewMode('grid')}
@@ -132,7 +133,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl animate-in slide-in-from-top-4 duration-200">
           <div className="p-6 space-y-6">
-            {!isWatchlistPage && (
+            {isHomePage && (
               <div className="bg-white/5 rounded-2xl border border-white/10 p-4">
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3 px-1">View Mode</p>
                 <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">

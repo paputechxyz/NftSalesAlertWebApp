@@ -215,6 +215,11 @@ function LandingPageContent() {
               placeholder="Search collections..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  handleManualAdd(searchQuery);
+                }
+              }}
               className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             />
             {searchQuery && (
@@ -383,7 +388,7 @@ function LandingPageContent() {
         isPro={tier > 1}
         message={tier > 1 
           ? "You've reached the Pro limit of 20 collections. Please remove a collection before adding a new one." 
-          : "Free users can only track 1 collection. Download our Android app to upgrade to Pro and track up to 20 collections!"
+          : "Free users can only track 1 collection. Upgrade to Pro on your profile page to track up to 20 collections with instant notifications!"
         }
       />
 

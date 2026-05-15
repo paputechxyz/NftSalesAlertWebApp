@@ -1,6 +1,7 @@
 'use client';
 
-import { X, Download, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,7 +12,14 @@ interface ModalProps {
 }
 
 export default function UpgradeModal({ isOpen, onClose, title, message, isPro = false }: ModalProps) {
+  const router = useRouter();
+
   if (!isOpen) return null;
+
+  const handleGoToProfile = () => {
+    router.push('/profile');
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -39,15 +47,13 @@ export default function UpgradeModal({ isOpen, onClose, title, message, isPro = 
           <div className="flex flex-col gap-3">
             {!isPro ? (
               <>
-                <a 
-                  href="https://play.google.com/store/apps/details?id=com.paputechxyz.openseasales"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all"
+                <button 
+                  onClick={handleGoToProfile}
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-500/20"
                 >
-                  <Download size={20} />
-                  Upgrade on Google Play
-                </a>
+                  <ArrowRight size={20} />
+                  Go to Profile to Upgrade
+                </button>
                 <button 
                   onClick={onClose}
                   className="px-6 py-3 text-slate-400 hover:text-white transition-colors text-sm font-medium"
