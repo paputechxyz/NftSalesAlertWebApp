@@ -23,9 +23,10 @@ export interface SaleEvent {
 
 interface SaleItemProps {
   sale: SaleEvent;
+  onImageClick?: (url: string) => void;
 }
 
-export default function SaleItem({ sale }: SaleItemProps) {
+export default function SaleItem({ sale, onImageClick }: SaleItemProps) {
   const timeAgo = (timestamp: number) => {
     const seconds = Math.floor(Date.now() / 1000 - timestamp);
     if (seconds < 5) return 'just now';
@@ -50,7 +51,10 @@ export default function SaleItem({ sale }: SaleItemProps) {
 
   return (
     <div className="glass-card overflow-hidden group flex flex-col sm:flex-row items-center p-4 gap-6 hover:border-blue-500/30 transition-all">
-      <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl">
+      <div 
+        className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl cursor-pointer"
+        onClick={() => sale.image_url && onImageClick?.(sale.image_url)}
+      >
         {sale.image_url ? (
           <Image
             src={sale.image_url}

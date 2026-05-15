@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
 import { getApiUrl } from '@/lib/api';
 import SaleItem, { SaleEvent } from './SaleItem';
-import { Loader2, Zap } from 'lucide-react';
+import { Loader2, Zap, X } from 'lucide-react';
 
 export default function SalesFeed() {
   const { user, getToken } = useAuth();
@@ -14,12 +14,21 @@ export default function SalesFeed() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [offset, setOffset] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
   const latestSaleDateRef = useRef<number>(0);
   const pageSize = 50;
 
 
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedImage(null);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   const fetchSales = useCallback(async (currentOffset: number, isInitial: boolean = false) => {
     if (!user) return;
@@ -127,14 +136,35 @@ export default function SalesFeed() {
           if (sales.length === index + 1) {
             return (
               <div ref={lastSaleElementRef} key={`${sale.txn_hash}-${index}`}>
-                <SaleItem sale={sale} />
+                <SaleItem sale={sale} onImageClick={setSelectedImage} />
               </div>
             );
           } else {
-            return <SaleItem key={`${sale.txn_hash}-${index}`} sale={sale} />;
+            return <SaleItem key={`${sale.txn_hash}-${index}`} sale={sale} onImageClick={setSelectedImage} />;
           }
         })}
       </div>
+
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center">
+            <img 
+              src={selectedImage} 
+              alt="NFT Large View" 
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl animate-in zoom-in-95 duration-200"
+            />
+            <button 
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-12 right-0 p-2 text-white hover:text-slate-300 transition-colors"
+            >
+              <X size={32} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {loadingMore && (
         <div className="py-8 flex justify-center">
