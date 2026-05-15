@@ -15,20 +15,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: 'NFT Sales Alert - Real-time NFT Market Tracker',
-  description: 'Track real-time NFT sales across multiple marketplaces. Get instant alerts, filter by collections, and monitor the NFT market in one place.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://app.nftsalesalert.com'),
+  title: {
+    default: 'NFT Sales Alert - Free Real-Time OpenSea Notifications',
+    template: '%s | NFT Sales Alert'
+  },
+  description: 'Get instant NFT sales alerts and notifications from OpenSea. Track floor prices, sales activity, and NFT collections in real-time with no wallet connection required.',
+  keywords: ['NFT sales alert', 'OpenSea notifications', 'NFT floor price tracker', 'Real-time NFT alerts', 'NFT price alerts', 'OpenSea sales bot', 'NFT watchlist'],
+  authors: [{ name: 'NFT Sales Alert' }],
+  creator: 'NFT Sales Alert',
+  publisher: 'NFT Sales Alert',
   openGraph: {
-    title: "NFT Sales Alert | Real-Time NFT Market Insights",
-    description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",
-    url: "https://nft-sales-alert.vercel.app", // Placeholder, will be replaced by actual URL if available
+    title: "NFT Sales Alert - Real-Time OpenSea Notifications",
+    description: "Never miss a flip. Get instant push notifications for NFT sales and floor price changes on OpenSea.",
+    url: "https://app.nftsalesalert.com",
     siteName: "NFT Sales Alert",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "NFT Sales Alert Social Preview",
+        alt: "NFT Sales Alert - Real-Time NFT Notifications",
       },
     ],
     locale: "en_US",
@@ -36,8 +43,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NFT Sales Alert | Real-Time NFT Market Insights",
-    description: "Monitor and analyze the latest NFT sales, volume, and floor prices from the most active collections with instant push notifications.",
+    title: "NFT Sales Alert - Real-Time OpenSea Notifications",
+    description: "Never miss a flip. Get instant push notifications for NFT sales and floor price changes on OpenSea.",
     images: ["/og-image.jpg"],
     creator: "@nftsalesalert",
   },
