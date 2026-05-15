@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "NFT Sales Alert",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "NFT Sales Alert - Real-Time NFT Notifications",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "NFT Sales Alert - Real-Time OpenSea Notifications",
     description: "Never miss a flip. Get instant push notifications for NFT sales on OpenSea.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
     creator: "@nftsalesalert",
   },
   icons: {
